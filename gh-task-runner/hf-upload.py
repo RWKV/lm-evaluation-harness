@@ -121,7 +121,7 @@ def upload_folder(folder_path, log_type="various"):
 
 # Upload the ipynb files
 print("# Uploading the various files ... ")
-upload_folder( f"{UPLOAD_DIR}", file_type="various" )
+upload_folder( f"{UPLOAD_DIR}", log_type="various" )
 
 print(f"# ------------------------------------")
 print(f"# Uploaded finished to: {hf_url}")
