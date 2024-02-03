@@ -6,6 +6,7 @@ on:
         description: 'Task to run'
         required: true
         default: 'arc'
+        type: choice
         options:
         - anli
         - arc
@@ -134,7 +135,7 @@ env:
 jobs:
   gh-task-runner-mps:
     # Name of the job
-    name: "[MPS-${{ github.event.inputs.model_hf_repo }}] ${{ github.event.inputs.custom_task || github.event.inputs.run_task }} - ${{ github.event.inputs.model_args }}"
+    name: "[MPS-${{ github.event.inputs.custom_task || github.event.inputs.run_task }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
 
     # Due to github worker hard limitation, of 24 hours
     # we apply a timeout of 23 hours instead.
