@@ -1752,7 +1752,7 @@ jobs:
       - name: Install dependencies / setup project
         run: |
           # Basic dependencies install, and output setup
-          pip install -e .
+          python -m pip install -e .
           mkdir -p ./output
 
           # Setup HF cache
@@ -1760,7 +1760,7 @@ jobs:
           ./gh-task-runner/hf-cache-setup.sh 
 
           # Install HF transformers and accelerate
-          python -m pip install accelerate transformers peft
+          python -m pip install accelerate transformers peft sqlitedict
 
       - name: Run Task
         run: |
