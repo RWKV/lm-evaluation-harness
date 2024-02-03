@@ -1777,6 +1777,10 @@ jobs:
 
           # Check if the few shot setting is larger or euqal to 0
           if [ ${{ github.event.inputs.num_fewshot }} -ge 0 ]; then
+            # Fail on pipe error
+            set -o pipefail
+
+            # Run it
             accelerate launch -m lm_eval --model hf \
             --model_args pretrained=${{ github.event.inputs.model_hf_repo }},${{ github.event.inputs.model_args }} \
             --tasks $task_to_run \
@@ -1785,6 +1789,10 @@ jobs:
             --num_fewshot ${{ github.event.inputs.num_fewshot }} \
             --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
           else
+            # Fail on pipe error
+            set -o pipefail
+
+            # Run it
             accelerate launch -m lm_eval --model hf \
             --model_args pretrained=${{ github.event.inputs.model_hf_repo }},${{ github.event.inputs.model_args }} \
             --tasks $task_to_run \
