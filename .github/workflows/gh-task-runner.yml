@@ -1704,6 +1704,8 @@ on:
         options:
         - 16
         - 24
+        - 40
+        - 48
         - 80
 
 env:
@@ -1720,7 +1722,7 @@ env:
   HUGGING_FACE_HUB_TOKEN: ${{secrets.HUGGING_FACE_HUB_TOKEN}}
 
 jobs:
-  gh-task-runner-mps:
+  gh-task-runner:
     # Name of the job
     name: "[${{ github.event.inputs.custom_task || github.event.inputs.run_task }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
 
@@ -1728,9 +1730,10 @@ jobs:
     # we apply a timeout of 23 hours instead.
     timeout-minutes: 1380
 
-    # Currently, MacOS ARM is only on v14.
-    # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners
-    runs-on: macos-14
+    # Select the type of runner that the job will run on
+    runs-on: 
+      - ${{ github.event.inputs.backend }}
+      - gpu-vram-${{ github.event.inputs.gpu_vram }}
 
     # Actual task setup, and run steps
     steps:
