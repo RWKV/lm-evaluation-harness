@@ -85,7 +85,7 @@ on:
         required: false
         default: ''
       num_fewshot:
-        description: 'Number of Fewshot Examples'
+        description: 'num_fewshot setting (ignored if < 0)'
         required: true
         default: -1
       model_hf_repo:
@@ -130,9 +130,6 @@ env:
 
   # Secrets
   HUGGING_FACE_HUB_TOKEN: ${{secrets.HUGGING_FACE_HUB_TOKEN}}
-
-  # Clean task name, replaces in task name * with _
-  CLEAN_TASK_NAME: ${{ env.RUN_TASK//'*'/'_' }}
 
 jobs:
   gh-task-runner-mps:
@@ -193,7 +190,7 @@ jobs:
       - name: Upload outputs to HF
         if: always()
         run: |
-          ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "${{ env.MODEL_HF_REPO }}/${{ env.CLEAN_TASK_NAME }}/MPS/${{ github.event.inputs.model_args }}" "./output"
+          ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "${{ env.MODEL_HF_REPO }}/${{ env.RUN_TASK//'*'/'_' }}/MPS/${{ github.event.inputs.model_args }}" "./output"
       # Note that this is meant to be a contigency measure, in case the HF upload failed
       - name: Save output models
         uses: actions/upload-artifact@v3
