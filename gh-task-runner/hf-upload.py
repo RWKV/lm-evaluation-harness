@@ -37,7 +37,7 @@ RUNNER_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJ_DIR = os.path.dirname(RUNNER_SCRIPT_DIR)
 
 # Generate the URL where all the items will be uploaded
-hf_url = f"https://huggingface.co/{HF_UPLOAD_REPO}/tree/main/{HF_UPLOAD_SUBDIR}"
+hf_url = f"https://huggingface.co/datasets/{HF_UPLOAD_REPO}/tree/main/{HF_UPLOAD_SUBDIR}"
 print(f"# ------------------------------------")
 print(f"# Uploading to: {hf_url}")
 print(f"# ------------------------------------")
