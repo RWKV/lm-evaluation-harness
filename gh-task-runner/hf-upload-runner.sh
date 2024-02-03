@@ -30,4 +30,4 @@ OUTPUT_DIR="$PROJ_DIR/output"
 
 # Run the python uploader, passing all the args
 cd "$PROJ_DIR"
-python3 ./hf-upload.py "$1" "$2" "$OUTPUT_DIR"
+python3 ./gh-task-runner/hf-upload.py "$1" "$2" "$OUTPUT_DIR"
