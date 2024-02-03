@@ -9,10 +9,6 @@ if [[ -z "${HUGGING_FACE_HUB_TOKEN}" ]]; then
     echo "[ERROR]: HUGGING_FACE_HUB_TOKEN is not set"
     exit 1
 fi
-if [[ -z "${WANDB_API_KEY}" ]]; then
-    echo "[ERROR]: WANDB_API_KEY is not set"
-    exit 1
-fi
 
 # Get the current script directories
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
