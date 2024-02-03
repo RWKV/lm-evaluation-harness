@@ -1,4 +1,4 @@
-name: GH Task Runner (MPS)
+name: GH Task Runner
 on:
   workflow_dispatch:
     inputs:
@@ -1688,23 +1688,23 @@ on:
         description: 'Batch Size'
         required: true
         default: 'auto'
-      # backend:
-      #   description: 'Backend to use'
-      #   required: true
-      #   default: 'mps'
-      #   options:
-      #   - nvidia-gpu
-      #   - intel-gpu
-      #   - amd-gpu
-      #   - any-gpu
-      # gpu_vram:
-      #   description: 'Minimum GPU VRAM (ignored for MPS)'
-      #   required: true
-      #   default: '24'
-      #   options:
-      #   - 16
-      #   - 24
-      #   - 80
+      backend:
+        description: 'Backend to use'
+        required: true
+        default: 'nvidia-gpu'
+        options:
+        - nvidia-gpu
+        - intel-gpu
+        - amd-gpu
+        - any-gpu
+      gpu_vram:
+        description: 'Minimum GPU VRAM (ignored for MPS)'
+        required: true
+        default: '24'
+        options:
+        - 16
+        - 24
+        - 80
 
 env:
   # Get the final task
@@ -1722,7 +1722,7 @@ env:
 jobs:
   gh-task-runner-mps:
     # Name of the job
-    name: "[MPS-${{ github.event.inputs.custom_task || github.event.inputs.run_task }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
+    name: "[${{ github.event.inputs.custom_task || github.event.inputs.run_task }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
 
     # Due to github worker hard limitation, of 24 hours
     # we apply a timeout of 23 hours instead.
@@ -1765,7 +1765,7 @@ jobs:
 
           # Check if the few shot setting is larger or euqal to 0
           if [ ${{ github.event.inputs.num_fewshot }} -ge 0 ]; then
-            lm_eval --model hf \
+            accelerate launch -m lm_eval --model hf \
             --model_args pretrained=${{ github.event.inputs.model_hf_repo }},${{ github.event.inputs.model_args }} \
             --tasks $task_to_run \
             --batch_size ${{ github.event.inputs.batch_size }} \
@@ -1773,7 +1773,7 @@ jobs:
             --num_fewshot ${{ github.event.inputs.num_fewshot }} \
             --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
           else
-            lm_eval --model hf \
+            accelerate launch -m lm_eval --model hf \
             --model_args pretrained=${{ github.event.inputs.model_hf_repo }},${{ github.event.inputs.model_args }} \
             --tasks $task_to_run \
             --batch_size ${{ github.event.inputs.batch_size }} \
@@ -1785,7 +1785,7 @@ jobs:
         if: always()
         run: |
           CLEANED_TASK=$(echo "${{ github.event.inputs.run_task }}" | sed 's/\*/_/g')
-          HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ github.event.inputs.model_args }}-num_fewshot=${{ github.event.inputs.num_fewshot }}/MPS/"
+          HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ github.event.inputs.model_args }}-num_fewshot=${{ github.event.inputs.num_fewshot }}/${{ github.event.inputs.backend }}/"
           ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
       # Note that this is meant to be a contigency measure, in case the HF upload failed
       - name: Save output Files
