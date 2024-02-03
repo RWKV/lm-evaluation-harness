@@ -1,4 +1,4 @@
-name: GH Task Runner
+name: GH Single Task Runner
 on:
   workflow_dispatch:
     inputs:
