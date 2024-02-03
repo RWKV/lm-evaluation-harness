@@ -9,24 +9,14 @@ if [[ -z "${HUGGING_FACE_HUB_TOKEN}" ]]; then
     echo "[ERROR]: HUGGING_FACE_HUB_TOKEN is not set"
     exit 1
 fi
-# if [[ -z "${WANDB_API_KEY}" ]]; then
-#     echo "[ERROR]: WANDB_API_KEY is not set"
-#     exit 1
-# fi
-
-# The HF repo directory to use
-if [[ -z "${HF_REPO_SYNC}" ]]; then
-    HF_REPO_SYNC="rwkv-x-dev/lm-eval-output"
+if [[ -z "${WANDB_API_KEY}" ]]; then
+    echo "[ERROR]: WANDB_API_KEY is not set"
+    exit 1
 fi
 
 # Get the current script directories
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJ_DIR="$(dirname "$SCRIPT_DIR")"
-
-# Output directory
-OUTPUT_DIR="$PROJ_DIR/output"
-
-# -----
 
 # Assume the ACTION dir, is 4 dir levels up
 ACTION_DIR="$(dirname "$PROJ_DIR/../../../../")"
@@ -35,6 +25,12 @@ ACTION_DIR="$(cd "$ACTION_DIR" && pwd)"
 # Cache dir to use when possible
 CACHE_DIR="$ACTION_DIR/.cache/"
 mkdir -p "$CACHE_DIR"
+
+# Log the proj dir
+echo "# ------------------------------"
+echo "# Starting HF cache"
+echo "# CACHE_DIR: $CACHE_DIR"
+echo "# ------------------------------"
 
 # -----
 # Cache dir size check
@@ -56,19 +52,29 @@ convert_to_bytes() {
     echo $size
 }
 
+if [[ -z "${RUNNER_CACHE_SIZE_LIMIT}" ]]; then
+    RUNNER_CACHE_SIZE_LIMIT="100G"
+fi
+RUNNER_CACHE_SIZE_LIMIT_BYTES=$(convert_to_bytes $RUNNER_CACHE_SIZE_LIMIT)
+
 # Get the cache directory size
 CACHE_SIZE=$(du -sh $CACHE_DIR | awk '{print $1}')
+CACHE_SIZE_BYTES=$(convert_to_bytes $CACHE_SIZE)
 
-echo "# ------------------------------"
-echo "# [NOTE] Cache dir size: ~$CACHE_SIZE"
-echo "# ------------------------------"
+# If the cache dir is larger then RUNNER_CACHE_SIZE_LIMIT, then delete the cache dir
+if [[ "$CACHE_SIZE_BYTES" -gt "$RUNNER_CACHE_SIZE_LIMIT_BYTES" ]]; then
+    echo "# [NOTE] Cache dir size ($CACHE_SIZE) is larger/equal to RUNNER_CACHE_SIZE_LIMIT ($RUNNER_CACHE_SIZE_LIMIT)"
+    echo "# [NOTE] Resetting cache dir: $CACHE_DIR"
+    rm -rf "$CACHE_DIR"
+    mkdir -p "$CACHE_DIR"
+else
+    echo "# [NOTE] Cache dir size: ~$CACHE_SIZE"
+fi
 
 # Cofigure the HF cache dir
 export HF_HOME="$CACHE_DIR/huggingface"
 mkdir -p "$HF_HOME"
 
-# -----
-
-# Run the python uploader, passing all the args
-cd "$PROJ_DIR"
-python3 ./gh-task-runner/hf-upload.py "$1" "$2" "$OUTPUT_DIR"
+# Get the cache directory size
+CACHE_SIZE=$(du -sh $CACHE_DIR | awk '{print $1}')
+echo "# [NOTE] Final Cache dir size: ~$CACHE_SIZE"

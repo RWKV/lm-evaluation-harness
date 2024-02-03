@@ -1751,6 +1751,12 @@ jobs:
 
       - name: Run Task
         run: |
+          # Setup HF cache
+          ./gh-task-runner/hf-cache-setup.sh 
+          echo "# ------------------------------"
+          echo "# Running Task ...."
+          echo "# ------------------------------"
+
           # Get the final task to run
           task_to_run=${{ github.event.inputs.custom_task }}
           if [ -z "$task_to_run" ]; then
@@ -1782,7 +1788,7 @@ jobs:
           HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ github.event.inputs.model_args }}-num_fewshot=${{ github.event.inputs.num_fewshot }}/MPS/"
           ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
       # Note that this is meant to be a contigency measure, in case the HF upload failed
-      - name: Save output models
+      - name: Save output Files
         uses: actions/upload-artifact@v3
         # if: failure()
         if: always()
@@ -1790,6 +1796,6 @@ jobs:
           name: output-files
           path: |
             output/*
-          # retention-days: 90
+          retention-days: 365
 
       
