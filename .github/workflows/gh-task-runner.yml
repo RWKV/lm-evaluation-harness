@@ -1757,6 +1757,7 @@ jobs:
 
           # Install HF transformers and accelerate
           python -m pip install accelerate transformers peft sqlitedict
+          # Depencies for rwkv infctx
           python -m pip install lightning==2.1.3 deepspeed==0.12.6 ninja numexpr jsonargparse 'jsonargparse[signatures]' lm-dataformat ftfy sentencepiece tokenizers wandb papermill
 
           # Setup HF cache
