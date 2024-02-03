@@ -1692,6 +1692,7 @@ on:
         description: 'Backend to use'
         required: true
         default: 'nvidia-gpu'
+        type: choice
         options:
         - nvidia-gpu
         - intel-gpu
@@ -1701,6 +1702,7 @@ on:
         description: 'Minimum GPU VRAM (ignored for MPS)'
         required: true
         default: '24'
+        type: choice
         options:
         - 16
         - 24
@@ -1755,7 +1757,10 @@ jobs:
       - name: Run Task
         run: |
           # Setup HF cache
+          chmod +x ./gh-task-runner/*.sh
           ./gh-task-runner/hf-cache-setup.sh 
+
+          # Run it
           echo "# ------------------------------"
           echo "# Running Task ...."
           echo "# ------------------------------"
