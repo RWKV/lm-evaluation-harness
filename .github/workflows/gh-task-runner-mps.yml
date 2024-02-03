@@ -190,7 +190,9 @@ jobs:
       - name: Upload outputs to HF
         if: always()
         run: |
-          ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "${{ env.MODEL_HF_REPO }}/${{ env.RUN_TASK//'*'/'_' }}/MPS/${{ github.event.inputs.model_args }}" "./output"
+          CLEANED_TASK=$(echo "${{ github.event.inputs.run_task }}" | sed 's/\*/_/g')
+          HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/MPS/${{ github.event.inputs.model_args }}"
+          ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
       # Note that this is meant to be a contigency measure, in case the HF upload failed
       - name: Save output models
         uses: actions/upload-artifact@v3
