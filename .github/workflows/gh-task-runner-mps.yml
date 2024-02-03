@@ -1,0 +1,141 @@
+name: GH Task Runner (MPS)
+on:
+  workflow_dispatch:
+    inputs:
+      run_task:
+        description: 'Task to run'
+        required: true
+        default: 'arc'
+        options:
+        - anli
+        - arc
+        - arithmetic
+        - asdiv
+        - babi
+        - bbh
+        - belebele
+        - benchmarks
+        - bigbench
+        - blimp
+        - ceval
+        - cmmlu
+        - code_x_glue
+        - coqa
+        - crows_pairs
+        - csatqa
+        - drop
+        - fld
+        - glue
+        - gsm8k
+        - headqa
+        - hellaswag
+        - hendrycks_ethics
+        - ifeval
+        - kmmlu
+        - kobest
+        - lambada
+        - lambada_cloze
+        - lambada_multilingual
+        - logiqa
+        - logiqa2
+        - mathqa
+        - mc_taco
+        - medmcqa
+        - medqa
+        - mgsm
+        - minerva_math
+        - model_written_evals
+        - mutual
+        - nq_open
+        - okapi
+        - openbookqa
+        - paws-x
+        - piqa
+        - pile
+        - polemo2
+        - prost
+        - pubmedqa
+        - qa4mre
+        - qasper
+        - race
+        - realtoxicityprompts
+        - sciq
+        - scrolls
+        - siqa
+        - squadv2
+        - storycloze
+        - super_glue
+        - swag
+        - toxigen
+        - translation
+        - triviaqa
+        - truthfulqa
+        - unscramble
+        - webqs
+        - wikitext
+        - winogrande
+        - wmt2016
+        - wsc273
+        - xcopa
+        - xnli
+        - xstorycloze
+        - xwinograd
+      custom_task:
+        description: 'Custom Task to run (overwrites previous)'
+        required: false
+        default: ''
+      model_hf_repo:
+        description: 'Model Hugging Face Repository'
+        required: true
+        default: 'RWKV/rwkv-5-world-1b5'
+      model_args:
+        description: 'Model Arguments'
+        required: false
+        default: 'dtype="float32",trust_remote_code=True'
+      batch_size:
+        description: 'Batch Size'
+        required: true
+        default: 'auto'
+      # backend:
+      #   description: 'Backend to use'
+      #   required: true
+      #   default: 'mps'
+      #   options:
+      #   - nvidia-gpu
+      #   - intel-gpu
+      #   - amd-gpu
+      #   - any-gpu
+      # gpu_vram:
+      #   description: 'Minimum GPU VRAM (ignored for MPS)'
+      #   required: true
+      #   default: '24'
+      #   options:
+      #   - 16
+      #   - 24
+      #   - 80
+
+jobs:
+  gh-task-runner-mps:
+    # Due to github worker hard limitation, of 24 hours
+    # we apply a timeout of 23 hours instead.
+    timeout-minutes: 1380
+
+    # Currently, MacOS ARM is only on v14.
+    # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners
+    runs-on: macos-14
+
+    # Actual task setup, and run steps
+    steps:
+      - name: Clone
+        id: checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' 
+          
+      - name: Install dependencies
+        run: |
+          pip install -e .
