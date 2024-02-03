@@ -1760,7 +1760,7 @@ jobs:
           ./gh-task-runner/hf-cache-setup.sh 
 
           # Install HF transformers and accelerate
-          pip install accelerate transformers
+          python -m pip install accelerate transformers peft
 
       - name: Run Task
         run: |
