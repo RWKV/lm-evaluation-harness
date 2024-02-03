@@ -1751,15 +1751,19 @@ jobs:
           
       - name: Install dependencies / setup project
         run: |
+          # Basic dependencies install, and output setup
           pip install -e .
           mkdir -p ./output
 
-      - name: Run Task
-        run: |
           # Setup HF cache
           chmod +x ./gh-task-runner/*.sh
           ./gh-task-runner/hf-cache-setup.sh 
 
+          # Install HF transformers and accelerate
+          pip install accelerate transformers
+
+      - name: Run Task
+        run: |
           # Run it
           echo "# ------------------------------"
           echo "# Running Task ...."
