@@ -69,9 +69,9 @@ jobs:
 
     # Strategy Matrix
     strategy:
+      # Disable fail-fast behavior
+      fail-fast: false 
       matrix:
-        # Disable fail-fast behavior
-        fail-fast: false 
         # NOTE: There is a matrix limit of 256 on github
         run_task:
           - anli
