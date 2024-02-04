@@ -1681,9 +1681,9 @@ on:
         required: true
         default: 'RWKV/rwkv-5-world-1b5'
       model_args:
-        description: 'Model Arguments'
+        description: 'Model Arguments (ie: dtype="fp16")'
         required: false
-        default: 'dtype="float32",trust_remote_code=True'
+        default: 'trust_remote_code=True'
       batch_size:
         description: 'Batch Size'
         required: true
