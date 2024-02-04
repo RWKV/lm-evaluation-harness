@@ -307,7 +307,7 @@ jobs:
       - name: Upload outputs to HF
         if: always()
         run: |
-          CLEANED_TASK=$(echo "$task_to_run" | sed 's/\*/_/g')
+          CLEANED_TASK=$(echo "${{ matrix.run_task }}" | sed 's/\*/_/g')
           HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ github.event.inputs.model_args }}-num_fewshot=${{ github.event.inputs.num_fewshot }}/${{ github.event.inputs.backend }}/"
           ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
       # Note that this is meant to be a contigency measure, in case the HF upload failed
