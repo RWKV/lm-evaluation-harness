@@ -1,4 +1,4 @@
-name: GH Single Task Runner
+name: GH ALL Task Runner
 on:
   workflow_dispatch:
     inputs:
@@ -43,6 +43,10 @@ on:
         - 40
         - 48
         - 80
+      num_fewshot:
+        description: 'num_fewshot setting (ignored if < 0)'
+        required: true
+        default: -1
 
 env:
   # Get the final task
