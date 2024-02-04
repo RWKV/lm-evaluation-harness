@@ -306,13 +306,29 @@ jobs:
             --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
           fi
 
-      - name: Upload outputs to HF
+      ########################################################################
+      # We disable HF upload for large runs, as it WILL hit the rate limits
+      ########################################################################
+      # - name: Upload outputs to HF
+      #   if: always()
+      #   run: |
+      #     CLEANED_TASK=$(echo "${{ matrix.run_task }}" | sed 's/\*/_/g')
+      #     HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ github.event.inputs.model_args }}-num_fewshot=${{ github.event.inputs.num_fewshot }}/${{ github.event.inputs.backend }}/"
+      #     ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
+
+      ########################################################################
+      # Instead we adjust the format for GH-Upload
+      ########################################################################
+      - name: Change to GH-Upload format
         if: always()
         run: |
           CLEANED_TASK=$(echo "${{ matrix.run_task }}" | sed 's/\*/_/g')
           HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ github.event.inputs.model_args }}-num_fewshot=${{ github.event.inputs.num_fewshot }}/${{ github.event.inputs.backend }}/"
-          ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
-      # Note that this is meant to be a contigency measure, in case the HF upload failed
+          
+          # Move the files
+          mkdir -p "./gh-upload/$HF_SUBDIR_PATH"
+          mv ./output/* "./gh-upload/$HF_SUBDIR_PATH"
+
       - name: Save output Files
         uses: actions/upload-artifact@v3
         # if: failure()
@@ -320,7 +336,7 @@ jobs:
         with:
           name: output-files
           path: |
-            output/*
+            gh-upload/*
           retention-days: 365
 
       
