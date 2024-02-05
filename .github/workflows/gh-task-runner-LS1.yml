@@ -197,7 +197,7 @@ jobs:
           - gsm8k_cot_self_consistency
           - hellaswag
           - hendrycks_ethics
-          # NOTE: ifeval requires langdetect
+          # NOTE: ifeval requires langdetect immutabledict
           - ifeval
           - kmmlu
           # - kmmlu_*
@@ -310,7 +310,7 @@ jobs:
           python -m pip install -e .
 
           # Needed for ifeval
-          python -m pip install langdetect
+          python -m pip install langdetect immutabledict
 
           # Setup HF cache
           chmod +x ./gh-task-runner/*.sh
