@@ -335,7 +335,6 @@ jobs:
             --model_args pretrained=${{ github.event.inputs.model_hf_repo }},${{ github.event.inputs.model_args }} \
             --tasks $task_to_run \
             --batch_size ${{ github.event.inputs.batch_size }} \
-            --device mps \
             --num_fewshot ${{ github.event.inputs.num_fewshot }} \
             --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
           else
@@ -347,7 +346,6 @@ jobs:
             --model_args pretrained=${{ github.event.inputs.model_hf_repo }},${{ github.event.inputs.model_args }} \
             --tasks $task_to_run \
             --batch_size ${{ github.event.inputs.batch_size }} \
-            --device mps \
             --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
           fi
 
