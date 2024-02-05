@@ -74,49 +74,54 @@ jobs:
       matrix:
         # NOTE: There is a matrix limit of 256 on github
         run_task:
+          ### Known Problematic tasks (various error reasons - file missing, temp=0, etc)
+          ### ----------------------------------------------------------------------------
+          # - anagrams*
+          # - arithmetic_*
+          # - asdiv
+          # - babi
+          # - bbh
+          # - bbh_cot_fewshot
+          # # - bbh_cot_fewshot_*
+          # - bbh_cot_zeroshot
+          # # - bbh_cot_zeroshot_*
+          # - bbh_fewshot
+          # # - bbh_fewshot_*
+          # - bbh_zeroshot
+          # # - bbh_zeroshot_*
+          # - belebele
+          # # - belebele_*
+          # - bigbench_*
+          # - boolq-seq2seq
+
+          ### Some tasks were commented out due to overlaps
+          ### ----------------------------------------------------------------------------
           - anli
           - arc_easy
           - arc_challenge
           - ai2_arc
-          - anagrams*
           - anli_*
           - advanced_ai_risk
-          - advanced_ai_risk_fewshot-*
-          - advanced_ai_risk_human-*
-          - advanced_ai_risk_lm-*
+          # - advanced_ai_risk_fewshot-*
+          # - advanced_ai_risk_human-*
+          # - advanced_ai_risk_lm-*
           - arithmetic
-          - arithmetic_*
-          - asdiv
-          - babi
-          - bbh
-          - bbh_cot_fewshot
-          - bbh_cot_fewshot_*
-          - bbh_cot_zeroshot
-          - bbh_cot_zeroshot_*
-          - bbh_fewshot
-          - bbh_fewshot_*
-          - bbh_zeroshot
-          - bbh_zeroshot_*
-          - belebele
-          - belebele_*
-          - bigbench_*
           - blimp
           - blimp_*
           - boolq
-          - boolq-seq2seq
           - cb
           - ceval-valid
-          - ceval-valid_*
+          # - ceval-valid_*
           - chain_of_thought
           - cmmlu
-          - cmmlu_*
+          # - cmmlu_*
           - code2text_*
           - codexglue_code2text
           - cola
           - copa
           - coqa
           - crows_pairs
-          - crows_pairs_*
+          # - crows_pairs_*
           - csatqa
           - csatqa_*
           - cycle_letters
