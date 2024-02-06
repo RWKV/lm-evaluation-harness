@@ -1,0 +1,116 @@
+name: GH Task Runner (Ethics & Alignment)
+on:
+  workflow_dispatch:
+    inputs:
+      approval_notice:
+        description: 'WARNING: This will spin up a large number of tasks - get approval from admin before running'
+        required: false
+        default: 'NOT_APPROVED'
+        type: choice
+        options:
+        - NOT_APPROVED
+        - APPROVED
+      model_hf_repo:
+        description: 'Model Hugging Face Repository'
+        required: true
+        default: 'RWKV/rwkv-5-world-1b5'
+      model_args:
+        description: 'Model Arguments (ie: dtype="fp16")'
+        required: false
+        default: 'trust_remote_code=True'
+      batch_size:
+        description: 'Batch Size'
+        required: true
+        default: 'auto'
+      backend:
+        description: 'Backend to use'
+        required: true
+        default: 'nvidia-gpu'
+        type: choice
+        options:
+        - nvidia-gpu
+        - intel-gpu
+        - amd-gpu
+        - any-gpu
+      gpu_vram:
+        description: 'Minimum GPU VRAM (ignored for MPS)'
+        required: true
+        default: '24'
+        type: choice
+        options:
+        - 16
+        - 24
+        - 40
+        - 48
+        - 80
+      num_fewshot:
+        description: 'num_fewshot setting (ignored if < 0)'
+        required: true
+        default: -1
+
+env:
+  # HF repo to sync to
+  HF_REPO_SYNC: rwkv-x-dev/lm-eval-output
+
+  # Model HF repo
+  MODEL_HF_REPO: ${{ github.event.inputs.model_hf_repo }}
+
+  # Secrets
+  HUGGING_FACE_HUB_TOKEN: ${{secrets.HUGGING_FACE_HUB_TOKEN}}
+
+jobs:
+  gh-task-runner-large-suite-1:
+
+    # Check for approval notice
+    if: ${{ github.event.inputs.approval_notice == 'APPROVED' }}
+
+    # Strategy Matrix
+    strategy:
+      # Disable fail-fast behavior
+      fail-fast: false 
+      matrix:
+
+        # NOTE: There is a matrix limit of 256 on github
+        run_task:
+          ### Various alignment / risk tasks : Under 10 minutes, for a 1b5 model
+          ### ----------------------------------------------------------------------------
+          - advanced_ai_risk
+          # - advanced_ai_risk_fewshot-*
+          # - advanced_ai_risk_human-*
+          # - advanced_ai_risk_lm-*
+          - ethics_*
+          - hendrycks_ethics
+          - persona
+          # - persona_*
+          - social_bias
+          - social_iqa
+
+    # Name of the job
+    name: "[${{ matrix.run_task }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
+
+    # Due to github worker hard limitation, of 24 hours
+    # we apply a timeout of 23 hours instead.
+    timeout-minutes: 1380
+
+    # Select the type of runner that the job will run on
+    runs-on: 
+      - ${{ github.event.inputs.backend }}
+      - gpu-vram-${{ github.event.inputs.gpu_vram }}
+      - ${{ matrix.gpu_count }}
+
+    # Actual task setup, and run steps
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run the task
+        uses: ./.github/actions/gh-task-runner-composite
+        with:
+          run_task: ${{ github.event.inputs.run_task }}
+          num_fewshot: ${{ github.event.inputs.num_fewshot }}
+          model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
+          model_args: ${{ github.event.inputs.model_args }}
+          batch_size: ${{ github.event.inputs.batch_size }}
+          upload_to_hf: false
+      
+      

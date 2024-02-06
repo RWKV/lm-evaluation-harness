@@ -154,6 +154,9 @@ jobs:
           # # - storycloze_*
           # - self_consistency
 
+          ### Commented out tasks, are rolled up in their larger non _* varients
+          ### ============================================================================
+
           ### Extra long running tests (>=4hrs on 4x3090)
           ### Reserved for 8xGPU nodes, put up top for priority
           ### ----------------------------------------------------------------------------
@@ -162,21 +165,39 @@ jobs:
           - fld
           # - fld_*
           - translation
+          - gsm8k_cot_self_consistency
 
           # This takes over 24 hours on 4x3090s even ??
           - realtoxicityprompts
 
-          ### Commented out tasks, are rolled up in their larger non _* varients
+          ### Slow tasks (>=1 hr on 4x3090)
           ### ----------------------------------------------------------------------------
+          - wmt14
+          # - wmt14-*
+          - wmt16
+          # - wmt16-*
+          - math_word_problems
+
+          ### Medium Slow tasks (>=15 mins on 4x3090)
+          ### ----------------------------------------------------------------------------
+          - triviaqa
+          - record
+          - glue
+          - gsm8k
+          - kmmlu
+          - nq_open
+          - qqp
+          - pythia
+          # - kmmlu_*
+          
+          ### Faster tasks (<= 15 mins on 4x3090)
+          ### ----------------------------------------------------------------------------
+
           - anli
           # - anli_*
           - ai2_arc
           # - arc_easy
           # - arc_challenge
-          - advanced_ai_risk
-          # - advanced_ai_risk_fewshot-*
-          # - advanced_ai_risk_human-*
-          # - advanced_ai_risk_lm-*
           - arithmetic
           - blimp
           # - blimp_*
@@ -190,24 +211,17 @@ jobs:
           - copa
           - crows_pairs
           # - crows_pairs_*
-          - ethics_*
           - freebase
-          - glue
-          - gsm8k
-          - gsm8k_cot_self_consistency
           - hellaswag
-          - hendrycks_ethics
-          - kmmlu
-          # - kmmlu_*
           - kobest
           # - kobest_*
           - lambada
+          - lambada_cloze
           # - lambada_*
           - logieval
           - logiqa
           - logiqa2
           - loglikelihood
-          - math_word_problems
           - mathqa
           - mc_taco
           - medmcqa
@@ -223,53 +237,31 @@ jobs:
           - multirc
           - mutual
           - mutual_plus
-          - nq_open
           - openbookqa
-          - paws_*
-          - pawsx
-          - persona
-          # - persona_*
           - piqa
           - prost
           - pubmedqa
-          - pythia
           - qa4mre
           # - qa4mre_*
           - qnli
-          - qqp
           - race
-          - record
           - rte
           - sciq
           - sglue_rte
-          - social_bias
-          - social_iqa
           - sst2
           - swag
           - sycophancy
           # - sycophancy_on_*
-          - triviaqa
           - truthfulqa
           # - truthfulqa_*
           - webqs
           - wic
           - wikitext
           - winogrande
-          - wmt14
-          # - wmt14-*
-          - wmt16
-          # - wmt16-*
           - wnli
           - wsc
           - wsc273
-          - xcopa
-          # - xcopa_*
-          - xnli
-          # - xnli_*
-          - xstorycloze
-          # - xstorycloze_*
-          - xwinograd
-          # - xwinograd_*
+          
 
     # Name of the job
     name: "[${{ matrix.run_task }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
