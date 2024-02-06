@@ -83,7 +83,8 @@ jobs:
           ### Reserved for 8xGPU nodes, put up top for priority
           ### ----------------------------------------------------------------------------
           - chain_of_thought
-          - flan_held_*
+          - flan_held_in
+          - flan_held_out
           - fld
           # - fld_*
           - translation
