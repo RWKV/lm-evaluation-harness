@@ -1,0 +1,121 @@
+# See https://docs.github.com/en/actions/creating-actions/creating-a-composite-action
+# for more information on how to create and use composite actions
+name: 'GH Task Runner Composite'
+description: 'Run your task with the various options provided, and into the output folder - does not checkout/upload'
+inputs:
+  run_task:
+    description: 'Task to run'
+    default: 'anli'
+    required: true
+  num_fewshot:
+    description: 'num_fewshot setting (ignored if < 0)'
+    default: -1
+    required: true
+  model_hf_repo:
+    description: 'Model Hugging Face Repository'
+    default: 'RWKV/rwkv-5-world-1b5'
+    required: true
+  model_args:
+    description: 'Model Arguments (ie: dtype="fp16")'
+    default: 'trust_remote_code=True'
+    required: false
+  batch_size:
+    description: 'Batch Size'
+    default: 'auto'
+    required: true
+  upload_to_hf:
+    description: 'Upload results to HF'
+    default: False
+    type: boolean
+runs:
+  using: "composite"
+  steps:
+    # If this fails fast, we know quickly to isolate a dead GPU node
+    - name: nvidia-smi check (for easy debugging)
+      run: nvidia-smi
+
+    # Dependencies setup
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11' 
+    - name: Install dependencies / setup project
+      run: |
+        # Basic dependencies install, and output setup
+        mkdir -p ./output
+        python -m pip install .
+        python -m pip install -e .
+
+        # Needed for ifeval
+        python -m pip install langdetect immutabledict
+
+        # Setup HF cache
+        chmod +x ./gh-task-runner/*.sh
+        ./gh-task-runner/hf-cache-setup.sh 
+
+    - name: Run Task
+      run: |
+        # Get the final task to run
+        task_to_run=${{ inputs.run_task }}
+
+        echo "# ------------------------------"
+        echo "# Running Task : $task_to_run"
+        echo "# ------------------------------"
+
+        # Check if the few shot setting is larger or euqal to 0
+        if [ ${{ inputs.num_fewshot }} -ge 0 ]; then
+          # Fail on pipe error
+          set -o pipefail
+
+          # Run it
+          accelerate launch -m lm_eval --model hf \
+          --model_args pretrained=${{ inputs.model_hf_repo }},${{ inputs.model_args }} \
+          --tasks $task_to_run \
+          --batch_size ${{ inputs.batch_size }} \
+          --num_fewshot ${{ inputs.num_fewshot }} \
+          --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
+        else
+          # Fail on pipe error
+          set -o pipefail
+
+          # Run it
+          accelerate launch -m lm_eval --model hf \
+          --model_args pretrained=${{ inputs.model_hf_repo }},${{ inputs.model_args }} \
+          --tasks $task_to_run \
+          --batch_size ${{ inputs.batch_size }} \
+          --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
+        fi
+
+      ########################################################################
+      # We disable HF upload for large runs, as it WILL hit the rate limits
+      ########################################################################
+      - name: Upload outputs to HF
+        if: ${{ inputs.upload_to_hf }}
+        run: |
+          CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
+          HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
+          ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
+
+      ########################################################################
+      # Instead we adjust the format for GH-Upload
+      ########################################################################
+      - name: Change to GH-Upload format
+        if: always()
+        run: |
+          CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
+          HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
+          
+          # Move the files
+          mkdir -p "./upload/$HF_SUBDIR_PATH"
+          mv ./output/* "./upload/$HF_SUBDIR_PATH"
+
+      - name: Save output Files
+        uses: actions/upload-artifact@v3
+        # if: failure()
+        if: always()
+        with:
+          name: output-files
+          path: |
+            upload/*
+          retention-days: 90
+
+      

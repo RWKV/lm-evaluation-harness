@@ -1,4 +1,4 @@
-name: GH Single Task Runner
+name: GH Task Runner (Single)
 on:
   workflow_dispatch:
     inputs:
@@ -1742,73 +1742,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v5
+      - uses: actions/gh-task-runner-composite@v1
         with:
-          python-version: '3.11' 
-          
-      - name: Install dependencies / setup project
-        run: |
-          # Basic dependencies install, and output setup
-          mkdir -p ./output
-          python -m pip install .
-          python -m pip install -e .
-
-          # Setup HF cache
-          chmod +x ./gh-task-runner/*.sh
-          ./gh-task-runner/hf-cache-setup.sh 
-
-      - name: Run Task
-        run: |
-          # Run it
-          echo "# ------------------------------"
-          echo "# Running Task ...."
-          echo "# ------------------------------"
-
-          # Get the final task to run
-          task_to_run=${{ github.event.inputs.custom_task }}
-          if [ -z "$task_to_run" ]; then
-            task_to_run=${{ github.event.inputs.run_task }}
-          fi
-
-          # Check if the few shot setting is larger or euqal to 0
-          if [ ${{ github.event.inputs.num_fewshot }} -ge 0 ]; then
-            # Fail on pipe error
-            set -o pipefail
-
-            # Run it
-            accelerate launch -m lm_eval --model hf \
-            --model_args pretrained=${{ github.event.inputs.model_hf_repo }},${{ github.event.inputs.model_args }} \
-            --tasks $task_to_run \
-            --batch_size ${{ github.event.inputs.batch_size }} \
-            --num_fewshot ${{ github.event.inputs.num_fewshot }} \
-            --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
-          else
-            # Fail on pipe error
-            set -o pipefail
-
-            # Run it
-            accelerate launch -m lm_eval --model hf \
-            --model_args pretrained=${{ github.event.inputs.model_hf_repo }},${{ github.event.inputs.model_args }} \
-            --tasks $task_to_run \
-            --batch_size ${{ github.event.inputs.batch_size }} \
-            --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
-          fi
-
-      - name: Upload outputs to HF
-        if: always()
-        run: |
-          CLEANED_TASK=$(echo "${{ github.event.inputs.custom_task || github.event.inputs.run_task }}" | sed 's/\*/_/g')
-          HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ github.event.inputs.model_args }}-num_fewshot=${{ github.event.inputs.num_fewshot }}/${{ github.event.inputs.backend }}/"
-          ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
-      # Note that this is meant to be a contigency measure, in case the HF upload failed
-      - name: Save output Files
-        uses: actions/upload-artifact@v3
-        # if: failure()
-        if: always()
-        with:
-          name: output-files
-          path: |
-            output/*
-          retention-days: 90
-
+          run_task: ${{ github.event.inputs.run_task }}
+          num_fewshot: ${{ github.event.inputs.num_fewshot }}
+          model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
+          model_args: ${{ github.event.inputs.model_args }}
+          batch_size: ${{ github.event.inputs.batch_size }}
+          upload_to_hf: true
       
