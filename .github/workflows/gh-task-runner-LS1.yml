@@ -73,19 +73,6 @@ jobs:
       fail-fast: false 
       matrix:
 
-        # GPU count overwrites, for extra large tasks
-        include:
-          - gpu_count: gpu-count-any
-          # For extra large task, lets isolate them to 8x nodes
-          - run_task: chain_of_thought
-            gpu_count: gpu-count-8
-          - run_task: flan_held_*
-            gpu_count: gpu-count-8
-          - run_task: fld
-            gpu_count: gpu-count-8
-          # - run_task: gpt3_translation_benchmarks
-          #   gpu_count: gpu-count-8
-        
         # NOTE: There is a matrix limit of 256 on github
         run_task:
           ### Known Problematic tasks (various error reasons - file missing, temp=0, etc)
@@ -136,6 +123,9 @@ jobs:
           # # - polemo2_*
           # - pile
           # # - pile_*
+          # # NOTE: ifeval requires `pip install langdetect immutabledict nltk` (not documented)
+          # # However even after all that, it gives an "missing index error"
+          # - ifeval
           ## ----
           ## Requires hugging face login
           ## ----
@@ -165,6 +155,10 @@ jobs:
           - flan_held_*
           - fld
           # - fld_*
+          - translation
+
+          # This takes over 24 hours on 4x3090s even ??
+          - realtoxicityprompts
 
           ### Commented out tasks, are rolled up in their larger non _* varients
           ### ----------------------------------------------------------------------------
@@ -197,8 +191,6 @@ jobs:
           - gsm8k_cot_self_consistency
           - hellaswag
           - hendrycks_ethics
-          # NOTE: ifeval requires langdetect immutabledict
-          - ifeval
           - kmmlu
           # - kmmlu_*
           - kobest
@@ -242,7 +234,6 @@ jobs:
           - qnli
           - qqp
           - race
-          - realtoxicityprompts
           - record
           - rte
           - sciq
@@ -253,7 +244,6 @@ jobs:
           - swag
           - sycophancy
           # - sycophancy_on_*
-          - translation
           - triviaqa
           - truthfulqa
           # - truthfulqa_*
