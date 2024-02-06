@@ -123,9 +123,15 @@ jobs:
           # # - polemo2_*
           # - pile
           # # - pile_*
-          # # NOTE: ifeval requires `pip install langdetect immutabledict nltk` (not documented)
+          ## ----
+          ## Wierd package dependencies
+          ## ----
+          # #### ifeval requires `pip install langdetect immutabledict nltk` (not documented)
           # # However even after all that, it gives an "missing index error"
           # - ifeval
+          # #### minerva_math: antlr4 (not on pip?)
+          # - minerva_math
+          # # - minerva_math_*
           ## ----
           ## Requires hugging face login
           ## ----
@@ -207,8 +213,6 @@ jobs:
           - medmcqa
           - medqa_4options
           - mgsm_*
-          - minerva_math
-          # - minerva_math_*
           - mmlu
           # - mmlu_*
           - mnli
