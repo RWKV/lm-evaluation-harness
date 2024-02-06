@@ -1709,6 +1709,11 @@ on:
         - 40
         - 48
         - 80
+      upload_to_hf:
+        description: 'Upload to Hugging Face'
+        required: false
+        default: true
+        type: boolean
 
 env:
   # Get the final task
@@ -1749,5 +1754,5 @@ jobs:
           model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
           model_args: ${{ github.event.inputs.model_args }}
           batch_size: ${{ github.event.inputs.batch_size }}
-          upload_to_hf: true
+          upload_to_hf: ${{ github.event.inputs.upload_to_hf }}
       
