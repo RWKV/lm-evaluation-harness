@@ -1755,6 +1755,7 @@ jobs:
           # upload_to_hf: ${{ github.event.inputs.upload_to_hf }}
 
   upload_to_hf:
+    name: "Upload to Hugging Face"
     needs: gh-task-runner
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.upload_to_hf }}
