@@ -1,4 +1,4 @@
-name: GH Task Runner (Slow Suite)
+name: GH Task Runner (Error Suite)
 on:
   workflow_dispatch:
     inputs:
@@ -75,31 +75,84 @@ jobs:
 
         # NOTE: There is a matrix limit of 256 on github
         run_task:
-        
-          ### Commented out tasks, are rolled up in their larger non _* varients
-          ### ============================================================================
-
-          ### Extra long running tests (>=4hrs on 4x3090)
-          ### Reserved for 8xGPU nodes, put up top for priority
+          ### Known Problematic tasks (various error reasons - file missing, temp=0, etc)
           ### ----------------------------------------------------------------------------
-          - chain_of_thought
-          - flan_held_*
-          - fld
-          # - fld_*
-          - translation
-          - gsm8k_cot_self_consistency
-
-          # This takes over 24 hours on 4x3090s even ??
-          - realtoxicityprompts
-
-          ### Slow tasks (>=1 hr on 4x3090)
-          ### ----------------------------------------------------------------------------
-          - wmt14
-          # - wmt14-*
-          - wmt16
-          # - wmt16-*
-          - math_word_problems
-
+          ## ----
+          ## Need to double check (removed before i started organizing by failure reasons)
+          ## ----
+          - arithmetic_*
+          - asdiv
+          - bbh
+          - bbh_cot_fewshot
+          # - bbh_cot_fewshot_*
+          - bbh_cot_zeroshot
+          # - bbh_cot_zeroshot_*
+          - bbh_fewshot
+          # - bbh_fewshot_*
+          - bbh_zeroshot
+          # - bbh_zeroshot_*
+          - bigbench_*
+          - boolq-seq2seq
+          ## ----
+          ## temp=0 issues
+          ## ----
+          - anagrams*
+          - babi
+          - code2text_*
+          - codexglue_code2text
+          - coqa
+          - cycle_letters
+          - drop
+          - random_insertion
+          - unscramble
+          - super-glue-*
+          - squadv2
+          - scrolls
+          - reversed_words
+          - qasper
+          # - qasper_*
+          ## ----
+          ## Does not exists / file 404s / broken links
+          ## ----
+          - csatqa
+          - csatqa_*
+          - belebele
+          # - belebele_*
+          - generate_until
+          - polemo2
+          # - polemo2_*
+          - pile
+          # - pile_*
+          ## ----
+          ## Wierd package dependencies
+          ## ----
+          #### ifeval requires `pip install langdetect immutabledict nltk` (not documented)
+          # However even after all that, it gives an "missing index error"
+          - ifeval
+          #### minerva_math: antlr4 (not on pip?)
+          - minerva_math
+          # - minerva_math_*
+          ## ----
+          ## Requires hugging face login
+          ## ----
+          - toxigen
+          ## ----
+          ## Wierd errors (need to reinvestigate)
+          ## ----
+          - gpt3_translation_benchmarks
+          - gsm8k_cot
+          - headqa
+          # - headqa_en
+          # - headqa_es
+          - hellaswag_*
+          - iwslt2017
+          # - iwslt2017-*
+          - wmt-ro-en-t5-prompt
+          - wmt-t5-prompt
+          - t0_eval
+          - storycloze
+          # - storycloze_*
+          - self_consistency
 
     # Name of the job
     name: "[${{ matrix.run_task }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
@@ -112,7 +165,7 @@ jobs:
     runs-on: 
       - ${{ github.event.inputs.backend }}
       - gpu-vram-${{ github.event.inputs.gpu_vram }}
-      - gpu-count-8
+      # - gpu-count-8
 
     # Actual task setup, and run steps
     steps:
