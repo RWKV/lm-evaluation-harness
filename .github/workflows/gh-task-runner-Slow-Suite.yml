@@ -1,4 +1,4 @@
-name: GH Task Runner (Fast Suite)
+name: GH Task Runner (Slow Suite)
 on:
   workflow_dispatch:
     inputs:
