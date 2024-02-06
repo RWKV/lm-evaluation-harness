@@ -142,8 +142,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.upload_to_hf }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Run the task
-        uses: ./.github/actions/gh-task-runner-composite
+        uses: ./.github/actions/gh-upload-to-hf
         with:
           num_fewshot: ${{ github.event.inputs.num_fewshot }}
           model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
