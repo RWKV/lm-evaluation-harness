@@ -1,4 +1,4 @@
-name: GH Task Runner (Large Suite 1)
+name: GH Task Runner (Fast Suite)
 on:
   workflow_dispatch:
     inputs:
@@ -178,90 +178,6 @@ jobs:
           # - wmt16-*
           - math_word_problems
 
-          ### Medium Slow tasks (>=15 mins on 4x3090)
-          ### ----------------------------------------------------------------------------
-          - triviaqa
-          - record
-          - glue
-          - gsm8k
-          - kmmlu
-          - nq_open
-          - qqp
-          - pythia
-          # - kmmlu_*
-          
-          ### Faster tasks (<= 15 mins on 4x3090)
-          ### ----------------------------------------------------------------------------
-
-          - anli
-          # - anli_*
-          - ai2_arc
-          # - arc_easy
-          # - arc_challenge
-          - arithmetic
-          - blimp
-          # - blimp_*
-          - boolq
-          - cb
-          - ceval-valid
-          # - ceval-valid_*
-          - cmmlu
-          # - cmmlu_*
-          - cola
-          - copa
-          - crows_pairs
-          # - crows_pairs_*
-          - freebase
-          - hellaswag
-          - kobest
-          # - kobest_*
-          - lambada
-          - lambada_cloze
-          # - lambada_*
-          - logieval
-          - logiqa
-          - logiqa2
-          - loglikelihood
-          - mathqa
-          - mc_taco
-          - medmcqa
-          - medqa_4options
-          - mgsm_*
-          - mmlu
-          # - mmlu_*
-          - mnli
-          - mnli_mismatch
-          - mrpc
-          - multimedqa
-          - multiple_choice
-          - multirc
-          - mutual
-          - mutual_plus
-          - openbookqa
-          - piqa
-          - prost
-          - pubmedqa
-          - qa4mre
-          # - qa4mre_*
-          - qnli
-          - race
-          - rte
-          - sciq
-          - sglue_rte
-          - sst2
-          - swag
-          - sycophancy
-          # - sycophancy_on_*
-          - truthfulqa
-          # - truthfulqa_*
-          - webqs
-          - wic
-          - wikitext
-          - winogrande
-          - wnli
-          - wsc
-          - wsc273
-          
 
     # Name of the job
     name: "[${{ matrix.run_task }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
