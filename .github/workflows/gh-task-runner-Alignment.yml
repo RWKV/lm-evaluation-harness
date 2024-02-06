@@ -106,7 +106,7 @@ jobs:
       - name: Run the task
         uses: ./.github/actions/gh-task-runner-composite
         with:
-          run_task: ${{ github.event.inputs.run_task }}
+          run_task: ${{ matrix.run_task }}
           num_fewshot: ${{ github.event.inputs.num_fewshot }}
           model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
           model_args: ${{ github.event.inputs.model_args }}
