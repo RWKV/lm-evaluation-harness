@@ -1769,5 +1769,7 @@ jobs:
           --commit-message "[GHA] Auto Upload" \
           --create-pr \
           $HF_REPO_SYNC ./upload
+        
+        echo "Upload completed: https://huggingface.co/datasets/$HF_REPO_SYNC"
 
         
