@@ -23,10 +23,10 @@ inputs:
     description: 'Batch Size'
     default: 'auto'
     required: true
-  upload_to_hf:
-    description: 'Upload results to HF'
-    default: False
-    type: boolean
+  # upload_to_hf:
+  #   description: 'Upload results to HF'
+  #   default: False
+  #   type: boolean
 runs:
   using: "composite"
   steps:
@@ -89,16 +89,16 @@ runs:
           --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
         fi
 
-    ########################################################################
-    # We disable HF upload for large runs, as it WILL hit the rate limits
-    ########################################################################
-    - name: Upload outputs to HF
-      shell: bash
-      if: ${{ inputs.upload_to_hf }}
-      run: |
-        CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
-        HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
-        ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
+    # ########################################################################
+    # # We disable HF upload for large runs, as it WILL hit the rate limits
+    # ########################################################################
+    # - name: Upload outputs to HF
+    #   shell: bash
+    #   if: ${{ inputs.upload_to_hf }}
+    #   run: |
+    #     CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
+    #     HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
+    #     ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
 
     ########################################################################
     # Instead we adjust the format for GH-Upload
