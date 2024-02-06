@@ -1742,7 +1742,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/gh-task-runner-composite@v1
+      - uses: ./.github/actions/gh-task-runner-composite
         with:
           run_task: ${{ github.event.inputs.run_task }}
           num_fewshot: ${{ github.event.inputs.num_fewshot }}
