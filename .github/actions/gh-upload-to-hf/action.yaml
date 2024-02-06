@@ -49,6 +49,7 @@ runs:
 
     - name: Upload to huggingface
       shell: bash
+      continue-on-error: true
       if: always()
       run: |
         huggingface-cli upload --repo-type dataset \

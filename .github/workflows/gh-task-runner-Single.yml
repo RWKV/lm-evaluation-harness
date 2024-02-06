@@ -1712,7 +1712,7 @@ on:
       upload_to_hf:
         description: 'Upload to Hugging Face'
         required: false
-        default: true
+        default: false
         type: boolean
 
 env:
