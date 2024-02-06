@@ -32,13 +32,16 @@ runs:
   steps:
     # If this fails fast, we know quickly to isolate a dead GPU node
     - name: nvidia-smi check (for easy debugging)
+      shell: bash
       run: nvidia-smi
 
     # Dependencies setup
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11' 
+    
     - name: Install dependencies / setup project
+      shell: bash
       run: |
         # Basic dependencies install, and output setup
         mkdir -p ./output
@@ -55,6 +58,7 @@ runs:
         ./gh-task-runner/hf-cache-setup.sh 
 
     - name: Run Task
+      shell: bash
       run: |
         # Get the final task to run
         task_to_run=${{ inputs.run_task }}
@@ -87,37 +91,39 @@ runs:
           --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
         fi
 
-      ########################################################################
-      # We disable HF upload for large runs, as it WILL hit the rate limits
-      ########################################################################
-      - name: Upload outputs to HF
-        if: ${{ inputs.upload_to_hf }}
-        run: |
-          CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
-          HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
-          ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
+    ########################################################################
+    # We disable HF upload for large runs, as it WILL hit the rate limits
+    ########################################################################
+    - name: Upload outputs to HF
+      shell: bash
+      if: ${{ inputs.upload_to_hf }}
+      run: |
+        CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
+        HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
+        ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
 
-      ########################################################################
-      # Instead we adjust the format for GH-Upload
-      ########################################################################
-      - name: Change to GH-Upload format
-        if: always()
-        run: |
-          CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
-          HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
-          
-          # Move the files
-          mkdir -p "./upload/$HF_SUBDIR_PATH"
-          mv ./output/* "./upload/$HF_SUBDIR_PATH"
+    ########################################################################
+    # Instead we adjust the format for GH-Upload
+    ########################################################################
+    - name: Change to GH-Upload format
+      shell: bash
+      if: always()
+      run: |
+        CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
+        HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
+        
+        # Move the files
+        mkdir -p "./upload/$HF_SUBDIR_PATH"
+        mv ./output/* "./upload/$HF_SUBDIR_PATH"
 
-      - name: Save output Files
-        uses: actions/upload-artifact@v3
-        # if: failure()
-        if: always()
-        with:
-          name: output-files
-          path: |
-            upload/*
-          retention-days: 90
+    - name: Save output Files
+      uses: actions/upload-artifact@v3
+      # if: failure()
+      if: always()
+      with:
+        name: output-files
+        path: |
+          upload/*
+        retention-days: 90
 
       
