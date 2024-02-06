@@ -47,6 +47,11 @@ on:
         description: 'num_fewshot setting (ignored if < 0)'
         required: true
         default: -1
+      upload_to_hf:
+        description: 'Upload to Hugging Face'
+        required: false
+        default: true
+        type: boolean
 
 env:
   # Get the final task
@@ -79,6 +84,9 @@ jobs:
           ### Commented out tasks, are rolled up in their larger non _* varients
           ### ============================================================================
 
+          # This takes over 24 hours on 4x3090s even ??
+          - realtoxicityprompts
+
           ### Extra long running tests (>=4hrs on 4x3090)
           ### Reserved for 8xGPU nodes, put up top for priority
           ### ----------------------------------------------------------------------------
@@ -89,9 +97,7 @@ jobs:
           # - fld_*
           - translation
           - gsm8k_cot_self_consistency
-
-          # This takes over 24 hours on 4x3090s even ??
-          - realtoxicityprompts
+          - mgsm_*
 
           ### Slow tasks (>=1 hr on 4x3090)
           ### ----------------------------------------------------------------------------

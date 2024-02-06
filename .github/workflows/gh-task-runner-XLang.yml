@@ -47,6 +47,11 @@ on:
         description: 'num_fewshot setting (ignored if < 0)'
         required: true
         default: -1
+      upload_to_hf:
+        description: 'Upload to Hugging Face'
+        required: false
+        default: true
+        type: boolean
 
 env:
   # HF repo to sync to
