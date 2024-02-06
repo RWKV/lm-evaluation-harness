@@ -1753,4 +1753,20 @@ jobs:
           model_args: ${{ github.event.inputs.model_args }}
           batch_size: ${{ github.event.inputs.batch_size }}
           # upload_to_hf: ${{ github.event.inputs.upload_to_hf }}
-      
+
+  upload_to_hf:
+    needs: gh-task-runner
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.upload_to_hf }}
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        path: ./upload
+    - name: Upload to huggingface
+      run: |
+        huggingface-cli upload --repo-type dataset \
+          --commit-message "[GHA] Auto Upload" \
+          --create-pr \
+          $HF_REPO_SYNC ./upload
+
+        
