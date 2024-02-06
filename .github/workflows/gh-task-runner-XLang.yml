@@ -113,5 +113,3 @@ jobs:
           model_args: ${{ github.event.inputs.model_args }}
           batch_size: ${{ github.event.inputs.batch_size }}
           upload_to_hf: false
-      
-      
