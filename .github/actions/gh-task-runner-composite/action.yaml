@@ -46,7 +46,9 @@ runs:
         python -m pip install -e .
 
         # Needed for ifeval
-        python -m pip install langdetect immutabledict
+        python -m pip install langdetect immutabledict 
+        # Needed for minerva_math
+        python -m pip install antlr4
 
         # Setup HF cache
         chmod +x ./gh-task-runner/*.sh
