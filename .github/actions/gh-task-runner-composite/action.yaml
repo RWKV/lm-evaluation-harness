@@ -23,6 +23,10 @@ inputs:
     description: 'Batch Size'
     default: 'auto'
     required: true
+  backend:
+    description: 'Backend used'
+    default: 'nvidia-gpu'
+    required: true
   # upload_to_hf:
   #   description: 'Upload results to HF'
   #   default: False
@@ -108,7 +112,7 @@ runs:
       if: always()
       run: |
         CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
-        HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
+        HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}-${{ inputs.backend }}/"
         
         # Move the files
         mkdir -p "./upload/$HF_SUBDIR_PATH"

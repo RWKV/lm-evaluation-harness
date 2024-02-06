@@ -1,0 +1,68 @@
+# See https://docs.github.com/en/actions/creating-actions/creating-a-composite-action
+# for more information on how to create and use composite actions
+name: 'GH Upload to Hugging Face'
+description: 'Upload the files with the various options provided, from the upload folder'
+inputs:
+  run_task:
+    description: 'Task to run'
+    default: ''
+    required: false
+  num_fewshot:
+    description: 'num_fewshot setting (ignored if < 0)'
+    default: -1
+    required: true
+  model_hf_repo:
+    description: 'Model Hugging Face Repository'
+    default: 'RWKV/rwkv-5-world-1b5'
+    required: true
+  model_args:
+    description: 'Model Arguments (ie: dtype="fp16")'
+    default: 'trust_remote_code=True'
+    required: false
+  batch_size:
+    description: 'Batch Size'
+    default: 'auto'
+    required: true
+  backend:
+    description: 'Backend used'
+    default: 'nvidia-gpu'
+    required: true
+runs:
+  using: "composite"
+  steps:
+
+    # Dependencies setup
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11' 
+    
+    - name: Install dependencies / setup project
+      shell: bash
+      run: |
+        # Basic dependencies install, and output setup
+        mkdir -p ./output
+        python -m pip install -U "huggingface_hub[cli]"
+        
+    - uses: actions/download-artifact@v2
+      with:
+        path: ./upload
+
+    - name: Upload to huggingface
+      shell: bash
+      if: always()
+      run: |
+        huggingface-cli upload --repo-type dataset \
+          --commit-message "[GHA] Auto Upload" \
+          --create-pr \
+          $HF_REPO_SYNC ./upload
+        
+        # If run task is set, we log the upload path
+        if [ "${{ inputs.run_task }}" != "" ]; then
+          CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
+          HF_SUBDIR_PATH="${{ inputs.model_hf_repo }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}-${{ inputs.backend }}/"
+          
+          echo "Upload completed: https://huggingface.co/datasets/$HF_REPO_SYNC/$HF_SUBDIR_PATH"
+        else
+          echo "Upload completed: https://huggingface.co/datasets/$HF_REPO_SYNC"
+        fi
+      

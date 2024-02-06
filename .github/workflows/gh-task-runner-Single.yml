@@ -1752,6 +1752,7 @@ jobs:
           model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
           model_args: ${{ github.event.inputs.model_args }}
           batch_size: ${{ github.event.inputs.batch_size }}
+          backend: ${{ github.event.inputs.backend }}
           # upload_to_hf: ${{ github.event.inputs.upload_to_hf }}
 
   upload_to_hf:
@@ -1760,16 +1761,12 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.upload_to_hf }}
     steps:
-    - uses: actions/download-artifact@v2
-      with:
-        path: ./upload
-    - name: Upload to huggingface
-      run: |
-        huggingface-cli upload --repo-type dataset \
-          --commit-message "[GHA] Auto Upload" \
-          --create-pr \
-          $HF_REPO_SYNC ./upload
-        
-        echo "Upload completed: https://huggingface.co/datasets/$HF_REPO_SYNC"
-
-        
+      - name: Run the task
+        uses: ./.github/actions/gh-task-runner-composite
+        with:
+          run_task: ${{ github.event.inputs.custom_task || github.event.inputs.run_task }}
+          num_fewshot: ${{ github.event.inputs.num_fewshot }}
+          model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
+          model_args: ${{ github.event.inputs.model_args }}
+          batch_size: ${{ github.event.inputs.batch_size }}
+          backend: ${{ github.event.inputs.backend }}
