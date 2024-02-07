@@ -136,6 +136,8 @@ jobs:
           - ifeval
           #### minerva_math: antlr4 (not on pip?)
           - minerva_math
+          #### realtoxicityprompts: requires PERSPECTIVE_API_KEY
+          - realtoxicityprompts
           # - minerva_math_*
           ## ----
           ## Requires hugging face login
