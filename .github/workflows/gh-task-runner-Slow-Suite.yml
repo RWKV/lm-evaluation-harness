@@ -84,9 +84,6 @@ jobs:
           ### Commented out tasks, are rolled up in their larger non _* varients
           ### ============================================================================
 
-          # This takes over 24 hours on 4x3090s even ??
-          - realtoxicityprompts
-
           ### Extra long running tests (>=4hrs on 4x3090)
           ### Reserved for 8xGPU nodes, put up top for priority
           ### ----------------------------------------------------------------------------
@@ -99,6 +96,12 @@ jobs:
           - gsm8k_cot_self_consistency
           - mgsm_*
 
+          ### Seems to be unstable? Sometimes fast, sometimes slow, sometimes crash?
+          ### ----------------------------------------------------------------------------
+          - triviaqa
+          - record
+          - nq_open
+
           ### Slow tasks (>=1 hr on 4x3090)
           ### ----------------------------------------------------------------------------
           - wmt14
@@ -106,6 +109,7 @@ jobs:
           - wmt16
           # - wmt16-*
           - math_word_problems
+          
 
 
     # Name of the job

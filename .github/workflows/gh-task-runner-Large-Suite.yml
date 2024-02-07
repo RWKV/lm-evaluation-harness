@@ -82,12 +82,9 @@ jobs:
 
           ### Medium Slow tasks (>=15 mins on 4x3090)
           ### ----------------------------------------------------------------------------
-          - triviaqa
-          - record
           - glue
           - gsm8k
           - kmmlu
-          - nq_open
           - qqp
           - pythia
           # - kmmlu_*
