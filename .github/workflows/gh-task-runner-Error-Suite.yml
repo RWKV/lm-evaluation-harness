@@ -85,11 +85,7 @@ jobs:
           ## ----
           ## Need to double check (removed before i started organizing by failure reasons)
           ## ----
-          - arithmetic_*
-          - asdiv
           - bbh
-          - bbh_cot_fewshot
-          # - bbh_cot_fewshot_*
           - bbh_cot_zeroshot
           # - bbh_cot_zeroshot_*
           - bbh_fewshot
@@ -97,7 +93,6 @@ jobs:
           - bbh_zeroshot
           # - bbh_zeroshot_*
           - bigbench_*
-          - boolq-seq2seq
           ## ----
           ## temp=0 issues
           ## ----
@@ -147,11 +142,9 @@ jobs:
           ## Wierd errors (need to reinvestigate)
           ## ----
           - gpt3_translation_benchmarks
-          - gsm8k_cot
           - headqa
           # - headqa_en
           # - headqa_es
-          - hellaswag_*
           - iwslt2017
           # - iwslt2017-*
           - wmt-ro-en-t5-prompt

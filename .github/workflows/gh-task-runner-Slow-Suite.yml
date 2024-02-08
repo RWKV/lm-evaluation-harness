@@ -102,6 +102,13 @@ jobs:
           - record
           - nq_open
 
+          - bbh_cot_fewshot
+          # - bbh_cot_fewshot_*
+          - boolq-seq2seq
+          
+          - gsm8k_cot
+          - hellaswag_*
+
           ### Slow tasks (>=1 hr on 4x3090)
           ### ----------------------------------------------------------------------------
           - wmt14
