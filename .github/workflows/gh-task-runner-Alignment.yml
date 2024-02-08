@@ -50,7 +50,7 @@ on:
       upload_to_hf:
         description: 'Upload to Hugging Face'
         required: false
-        default: false
+        default: true
         type: boolean
 
 env:

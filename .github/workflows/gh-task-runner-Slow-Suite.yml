@@ -50,7 +50,7 @@ on:
       upload_to_hf:
         description: 'Upload to Hugging Face'
         required: false
-        default: false
+        default: true
         type: boolean
 
 env:
@@ -105,7 +105,7 @@ jobs:
           - bbh_cot_fewshot
           # - bbh_cot_fewshot_*
           - boolq-seq2seq
-          
+
           - gsm8k_cot
           - hellaswag_*
 

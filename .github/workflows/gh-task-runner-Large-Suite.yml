@@ -50,7 +50,7 @@ on:
       upload_to_hf:
         description: 'Upload to Hugging Face'
         required: false
-        default: false
+        default: true
         type: boolean
 
 env:
@@ -94,7 +94,7 @@ jobs:
 
           - arithmetic_*
           - asdiv
-          
+
           - anli
           # - anli_*
           - ai2_arc
