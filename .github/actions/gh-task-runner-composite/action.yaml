@@ -17,7 +17,7 @@ inputs:
     required: true
   model_args:
     description: 'Model Arguments (ie: dtype="fp16")'
-    default: 'trust_remote_code=True'
+    default: 'dtype=bfloat16,trust_remote_code=True'
     required: false
   batch_size:
     description: 'Batch Size'

@@ -17,7 +17,7 @@ on:
       model_args:
         description: 'Model Arguments (ie: dtype="fp16")'
         required: false
-        default: 'trust_remote_code=True'
+        default: 'dtype=bfloat16,trust_remote_code=True'
       batch_size:
         description: 'Batch Size'
         required: true
