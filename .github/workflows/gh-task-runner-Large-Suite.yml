@@ -80,6 +80,11 @@ jobs:
         # NOTE: There is a matrix limit of 256 on github
         run_task:
 
+          ### Large task collection, which overlaps with existing tasks
+          ### ----------------------------------------------------------------------------
+          # - multiple_choice
+          # - loglikelihood
+
           ### Medium Slow tasks (>=15 mins on 4x3090)
           ### ----------------------------------------------------------------------------
           - glue
@@ -123,7 +128,6 @@ jobs:
           - logieval
           - logiqa
           - logiqa2
-          - loglikelihood
           - mathqa
           - mc_taco
           - medmcqa
@@ -134,7 +138,6 @@ jobs:
           - mnli_mismatch
           - mrpc
           - multimedqa
-          - multiple_choice
           - multirc
           - mutual
           - mutual_plus

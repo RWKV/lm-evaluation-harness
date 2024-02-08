@@ -79,16 +79,20 @@ jobs:
         run_task:
           ### Various alignment / risk tasks : Under 10 minutes, for a 1b5 model
           ### ----------------------------------------------------------------------------
-          - advanced_ai_risk
-          # - advanced_ai_risk_fewshot-*
-          # - advanced_ai_risk_human-*
-          # - advanced_ai_risk_lm-*
-          - ethics_*
+
+          # Dropping Anthropic specific tasks
+          # ---
+          # - advanced_ai_risk
+          # # - advanced_ai_risk_fewshot-*
+          # # - advanced_ai_risk_human-*
+          # # - advanced_ai_risk_lm-*
+          # - persona
+          # # - persona_*
+          # - social_bias
+          # - social_iqa
+
           - hendrycks_ethics
-          - persona
-          # - persona_*
-          - social_bias
-          - social_iqa
+          # - ethics_*
 
     # Name of the job
     name: "[${{ matrix.run_task }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
