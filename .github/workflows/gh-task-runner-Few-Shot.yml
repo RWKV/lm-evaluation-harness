@@ -92,7 +92,7 @@ jobs:
           - 25
           
       include:
-        # Include mmlu with < 10 fewshot
+        # Include mmlu with <= 5 fewshot
         # As it does not work with > 5 fewshot
         - run_task: mmlu
           num_fewshot: 1
