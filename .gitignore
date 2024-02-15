@@ -22,4 +22,5 @@ results/*
 *.ipynb
 
 !.gitignore
-!.github/*
+!.github
+!.github/*/*.yml
