@@ -1709,8 +1709,8 @@ on:
         - 40
         - 48
         - 80
-      upload_to_hf:
-        description: 'Upload to Hugging Face'
+      upload_output:
+        description: 'Upload to HF / B2'
         required: false
         default: true
         type: boolean
@@ -1753,18 +1753,18 @@ jobs:
           model_args: ${{ github.event.inputs.model_args }}
           batch_size: ${{ github.event.inputs.batch_size }}
           backend: ${{ github.event.inputs.backend }}
-          # upload_to_hf: ${{ github.event.inputs.upload_to_hf }}
+          # upload_output: ${{ github.event.inputs.upload_output }}
 
-  upload_to_hf:
-    name: "Upload to Hugging Face"
+  upload_output:
+    name: "Upload to HF / B2"
     needs: gh-task-runner
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.upload_to_hf }}
+    if: ${{ github.event.inputs.upload_output }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Run the task
-        uses: ./.github/actions/gh-upload-to-hf
+        uses: ./.github/actions/gh-upload-output
         with:
           run_task: ${{ github.event.inputs.custom_task || github.event.inputs.run_task }}
           num_fewshot: ${{ github.event.inputs.num_fewshot }}

@@ -1,6 +1,6 @@
 # See https://docs.github.com/en/actions/creating-actions/creating-a-composite-action
 # for more information on how to create and use composite actions
-name: 'GH Upload to Hugging Face'
+name: 'GH Upload to HF / B2'
 description: 'Upload the files with the various options provided, from the upload folder'
 inputs:
   run_task:

@@ -27,7 +27,7 @@ inputs:
     description: 'Backend used'
     default: 'nvidia-gpu'
     required: true
-  # upload_to_hf:
+  # upload_output:
   #   description: 'Upload results to HF'
   #   default: False
   #   type: boolean
@@ -102,7 +102,7 @@ runs:
     # ########################################################################
     # - name: Upload outputs to HF
     #   shell: bash
-    #   if: ${{ inputs.upload_to_hf }}
+    #   if: ${{ inputs.upload_output }}
     #   run: |
     #     CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
     #     HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
