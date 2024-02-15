@@ -20,4 +20,6 @@ ipython_config.py
 results/*
 .*
 *.ipynb
-.gitignore
+
+!.gitignore
+!.github/*
