@@ -46,6 +46,7 @@ runs:
         
     - uses: actions/download-artifact@v2
       with:
+        name: output-files
         path: ./upload
 
     - name: Upload to backblaze
