@@ -56,8 +56,8 @@ runs:
         python -m pip install langdetect immutabledict 
         # Needed for some models
         python -m pip install einops
-        # # Needed for olmo model (not working)
-        # python -m pip install hf_olmo
+        # Needed for olmo model
+        python -m pip install ai2-olmo
 
         # Setup HF cache
         chmod +x ./gh-task-runner/*.sh
