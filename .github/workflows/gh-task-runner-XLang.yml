@@ -60,10 +60,11 @@ env:
   # Model HF repo
   MODEL_HF_REPO: ${{ github.event.inputs.model_hf_repo }}
 
-  # Secrets
+  # HF / B2 sync settings
   HUGGING_FACE_HUB_TOKEN: ${{secrets.HUGGING_FACE_HUB_TOKEN}}
   B2_APPLICATION_KEY_ID: ${{secrets.B2_APPLICATION_KEY_ID}}
   B2_APPLICATION_KEY: ${{secrets.B2_APPLICATION_KEY}}
+  B2_PATH_LM_EVAL_OUTPUT: ${{vars.B2_PATH_LM_EVAL_OUTPUT}}
 
 jobs:
   gh-task-runner:

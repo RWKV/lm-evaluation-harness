@@ -54,7 +54,7 @@ runs:
       if: always()
       run: |
         # Upload to backblaze
-        b2 upload-file $B2_BUCKET ./upload/ output-files/
+        b2 sync ./upload/ $B2_PATH_LM_EVAL_OUTPUT
 
     # This has been disabled, due to rate limits =[
     # ------------------------------------------------
