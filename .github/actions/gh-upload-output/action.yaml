@@ -39,31 +39,42 @@ runs:
     - name: Install dependencies / setup project
       shell: bash
       run: |
-        # Basic dependencies install, and output setup
-        mkdir -p ./output
-        python -m pip install -U "huggingface_hub[cli]"
+        # # Basic dependencies install, and output setup
+        # python -m pip install -U "huggingface_hub[cli]"
+        # python -m pip install -U setuptools
+        python -m pip install -U b2
         
     - uses: actions/download-artifact@v2
       with:
         path: ./upload
 
-    - name: Upload to huggingface
+    - name: Upload to backblaze
       shell: bash
       continue-on-error: true
       if: always()
       run: |
-        huggingface-cli upload --repo-type dataset \
-          --commit-message "[GHA] Auto Upload" \
-          --create-pr \
-          $HF_REPO_SYNC ./upload
+        # Upload to backblaze
+        b2 upload-file $B2_BUCKET ./upload/ output-files/
+
+    # This has been disabled, due to rate limits =[
+    # ------------------------------------------------
+    
+    # - name: Upload to huggingface
+    #   shell: bash
+    #   continue-on-error: true
+    #   if: always()
+    #   run: |
+    #     huggingface-cli upload --repo-type dataset \
+    #       --commit-message "[GHA] Auto Upload" \
+    #       $HF_REPO_SYNC ./upload
         
-        # If run task is set, we log the upload path
-        if [ "${{ inputs.run_task }}" != "" ]; then
-          CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
-          HF_SUBDIR_PATH="${{ inputs.model_hf_repo }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}-${{ inputs.backend }}/"
+    #     # If run task is set, we log the upload path
+    #     if [ "${{ inputs.run_task }}" != "" ]; then
+    #       CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
+    #       HF_SUBDIR_PATH="${{ inputs.model_hf_repo }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}-${{ inputs.backend }}/"
           
-          echo "Upload completed: https://huggingface.co/datasets/$HF_REPO_SYNC/$HF_SUBDIR_PATH"
-        else
-          echo "Upload completed: https://huggingface.co/datasets/$HF_REPO_SYNC"
-        fi
+    #       echo "Upload completed: https://huggingface.co/datasets/$HF_REPO_SYNC/$HF_SUBDIR_PATH"
+    #     else
+    #       echo "Upload completed: https://huggingface.co/datasets/$HF_REPO_SYNC"
+    #     fi
       
