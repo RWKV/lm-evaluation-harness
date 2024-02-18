@@ -94,15 +94,15 @@ jobs:
           - 10
           - 25
           
-      include:
-        # Include mmlu with <= 5 fewshot
-        # As it does not work with > 5 fewshot
-        - run_task: mmlu
-          num_fewshot: 1
-        - run_task: mmlu
-          num_fewshot: 2
-        - run_task: mmlu
-          num_fewshot: 5
+        include:
+          # Include mmlu with <= 5 fewshot
+          # As it does not work with > 5 fewshot
+          - run_task: mmlu
+            num_fewshot: 1
+          - run_task: mmlu
+            num_fewshot: 2
+          - run_task: mmlu
+            num_fewshot: 5
           
     # Name of the job
     name: "[${{ matrix.run_task }} - fs:${{ matrix.num_fewshot }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
