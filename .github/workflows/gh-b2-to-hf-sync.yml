@@ -99,10 +99,10 @@ jobs:
         run: |
           cd lm-eval-output && git reset --hard && git pull
 
-      - name: Sync files from B2
-        run: |
-          cd lm-eval-output
-          b2 sync --skipNewer $B2_PATH_LM_EVAL_OUTPUT ./lm-eval-output
+      # - name: Sync files from B2
+      #   run: |
+      #     cd lm-eval-output
+      #     b2 sync --skipNewer $B2_PATH_LM_EVAL_OUTPUT ./lm-eval-output
       
       - name: Huggingface CLI login
         shell: bash
