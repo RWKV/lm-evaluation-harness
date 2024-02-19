@@ -76,6 +76,9 @@ jobs:
           python -m pip install -U "huggingface_hub[cli]"
           python -m pip install -U b2
 
+          # Install git LFS
+          git lfs install
+
       - name: Cache Hugging Face repository
         id: cache-hf-repo
         uses: actions/cache@v2
@@ -89,7 +92,7 @@ jobs:
       - name: EITHER - Clone Hugging Face repository
         if: steps.cache-hf-repo.outputs.cache-hit != 'true'
         run: |
-          git clone https://huggingface.co/datasets/rwkv-x-dev/lm-eval-output lm-eval-output
+          git lfs clone --depth 1 https://huggingface.co/datasets/rwkv-x-dev/lm-eval-output lm-eval-output
 
       - name: OR - Pull latest changes from Hugging Face
         if: steps.cache-hf-repo.outputs.cache-hit == 'true'
