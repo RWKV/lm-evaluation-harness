@@ -190,6 +190,7 @@ jobs:
 
       - name: Run the task
         uses: ./.github/actions/gh-task-runner-composite
+        continue-on-error: true
         with:
           run_task: ${{ matrix.run_task }}
           num_fewshot: ${{ github.event.inputs.num_fewshot }}
