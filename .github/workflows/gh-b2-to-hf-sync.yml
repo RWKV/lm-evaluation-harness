@@ -1,4 +1,4 @@
-name: GH Task Runner (Single)
+name: Backblaze to Hugging Face Sync
 on:
   workflow_dispatch:
     inputs:
