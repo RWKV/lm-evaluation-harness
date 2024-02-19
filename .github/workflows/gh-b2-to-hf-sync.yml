@@ -63,5 +63,5 @@ jobs:
       - name: Pull latest changes
         if: steps.cache-hf-repo.outputs.cache-hit == 'true'
         run: |
-          cd lm-eval-output && git pull
+          cd lm-eval-output && git reset --hard && git pull
         
