@@ -1,0 +1,67 @@
+name: GH Task Runner (Single)
+on:
+  workflow_dispatch:
+    inputs:
+      upload_output:
+        description: 'Upload to HF / B2'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  # HF repo to sync to
+  HF_REPO_SYNC: rwkv-x-dev/lm-eval-output
+
+  # Model HF repo
+  MODEL_HF_REPO: ${{ github.event.inputs.model_hf_repo }}
+
+  # HF / B2 sync settings
+  HUGGING_FACE_HUB_TOKEN: ${{secrets.HUGGING_FACE_HUB_TOKEN}}
+  B2_APPLICATION_KEY_ID: ${{secrets.B2_APPLICATION_KEY_ID}}
+  B2_APPLICATION_KEY: ${{secrets.B2_APPLICATION_KEY}}
+  B2_PATH_LM_EVAL_OUTPUT: ${{vars.B2_PATH_LM_EVAL_OUTPUT}}
+
+jobs:
+  gh-b2-to-hf-sync:
+    # Name of the job
+    name: "B2 to HF Sync"
+
+    # Due to github worker hard limitation, of 24 hours
+    # we apply a timeout of 23 hours instead.
+    timeout-minutes: 1380
+
+    # Select the type of runner that the job will run on
+    runs-on: 
+      - ubuntu-latest
+
+    # Actual task setup, and run steps
+    steps:
+      
+      - name: Install dependencies / setup project
+        shell: bash
+        run: |
+          # Basic dependencies install, and output setup
+          python -m pip install -U setuptools
+          python -m pip install -U "huggingface_hub[cli]"
+          python -m pip install -U b2
+
+      - name: Cache Hugging Face repository
+        id: cache-hf-repo
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./lm-eval-output
+          key: huggingface/rwkv-x-dev/lm-eval-output/hash-${{ hashFiles('**') }}
+          # key: huggingface/rwkv-x-dev/lm-eval-output/hash-${{ steps.current-date.outputs.date }}
+          restore-keys: huggingface/rwkv-x-dev/lm-eval-output/hash-
+
+      - name: Clone Hugging Face repository
+        if: steps.cache-hf-repo.outputs.cache-hit != 'true'
+        run: |
+          git clone https://huggingface.co/datasets/rwkv-x-dev/lm-eval-output lm-eval-output
+
+      - name: Pull latest changes
+        if: steps.cache-hf-repo.outputs.cache-hit == 'true'
+        run: |
+          cd lm-eval-output && git pull
+        
