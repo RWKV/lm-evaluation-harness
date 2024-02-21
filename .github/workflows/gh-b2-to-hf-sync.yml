@@ -104,17 +104,16 @@ jobs:
       #     cd lm-eval-output
       #     b2 sync --skipNewer $B2_PATH_LM_EVAL_OUTPUT ./lm-eval-output
       
-      - name: Huggingface CLI login
-        shell: bash
-        run: |
-          huggingface-cli login --token $HUGGING_FACE_HUB_TOKEN --add-to-git-credential
+      # - name: Huggingface CLI login
+      #   shell: bash
+      #   run: |
+      #     huggingface-cli login --token $HUGGING_FACE_HUB_TOKEN --add-to-git-credential
 
-      - name: Commit and push changes
-        run: |
-          cd lm-eval-output
-          git config --global user.email "devops@rwkv.com"
-          git config --global user.name "rwkv-x-dev"
-          git add . && git commit -m "[GHA] Auto-sync from B2"
-          git push
-          
-        
+      # - name: Commit and push changes
+      #   run: |
+      #     cd lm-eval-output
+      #     git config --global user.email "devops@rwkv.com"
+      #     git config --global user.name "rwkv-x-dev"
+      #     git add . && git commit -m "[GHA] Auto-sync from B2"
+      #     git push
+
