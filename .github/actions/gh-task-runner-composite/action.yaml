@@ -27,10 +27,10 @@ inputs:
     description: 'Backend used'
     default: 'nvidia-gpu'
     required: true
-  # upload_output:
-  #   description: 'Upload results to HF'
-  #   default: False
-  #   type: boolean
+  upload_output:
+    description: 'Upload results to HF'
+    default: False
+    type: boolean
 runs:
   using: "composite"
   steps:
@@ -131,5 +131,20 @@ runs:
         path: |
           upload/*
         retention-days: 90
-
+    
+    ########################################################################
+    # Upload to B2 if configured
+    ########################################################################
+    - name: Install B2
+      shell: bash
+      if: ${{ inputs.upload_output }}
+      run: |
+        # Install B2
+        python -m pip install -U b2
+    - name: Upload to B2
+      shell: bash
+      if: ${{ inputs.upload_output }}
+      run: |
+        # Upload to backblaze
+        b2 sync ./upload/ $B2_PATH_LM_EVAL_OUTPUT
       

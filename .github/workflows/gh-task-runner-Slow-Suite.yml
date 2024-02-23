@@ -151,23 +151,23 @@ jobs:
           model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
           model_args: ${{ github.event.inputs.model_args }}
           batch_size: ${{ github.event.inputs.batch_size }}
-          # upload_output: False
+          upload_output: ${{ github.event.inputs.upload_output }}
 
-  upload_output:
-    name: "Upload to HF / B2"
-    needs: gh-task-runner
-    runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.upload_output }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Run the task
-        uses: ./.github/actions/gh-upload-output
-        with:
-          num_fewshot: ${{ github.event.inputs.num_fewshot }}
-          model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
-          model_args: ${{ github.event.inputs.model_args }}
-          batch_size: ${{ github.event.inputs.batch_size }}
-          backend: ${{ github.event.inputs.backend }}
+  # upload_output:
+  #   name: "Upload to HF / B2"
+  #   needs: gh-task-runner
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.event.inputs.upload_output }}
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
+  #     - name: Run the task
+  #       uses: ./.github/actions/gh-upload-output
+  #       with:
+  #         num_fewshot: ${{ github.event.inputs.num_fewshot }}
+  #         model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
+  #         model_args: ${{ github.event.inputs.model_args }}
+  #         batch_size: ${{ github.event.inputs.batch_size }}
+  #         backend: ${{ github.event.inputs.backend }}
           
       
