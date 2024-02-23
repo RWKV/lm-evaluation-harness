@@ -91,6 +91,7 @@ jobs:
           - xwinograd
           # - xwinograd_*
           - lambada_multilingual
+          # - lambada_openai_*
           - pawsx
           # - paws_*
 
