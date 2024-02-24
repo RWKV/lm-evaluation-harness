@@ -63,6 +63,12 @@ runs:
         chmod +x ./gh-task-runner/*.sh
         ./gh-task-runner/hf-cache-setup.sh 
 
+    # - name: Download and convert the model
+    #   shell: bash
+    #   run: |
+    #     # Basic dependencies install, and output setup
+
+
     - name: Run Task
       shell: bash
       run: |
