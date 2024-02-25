@@ -18,7 +18,7 @@ if [[ -z "${RWKV_PTH_URL}" ]]; then
     echo "### [ERROR]: RWKV_PTH_URL is not set, run with the URL as the first argument : ./prepare-rwkv-v5-pth.sh <URL>"
     exit 1
 else 
-    echo "### RWKV_PTH_URL is set to $RWKV_PTH_URL"
+    echo "### RWKV_PTH_URL : $RWKV_PTH_URL"
 fi
 
 # Goto the project directory
@@ -38,8 +38,62 @@ fi
 
 # Download the model
 echo "### Downloading the model from $RWKV_PTH_URL"
-# rm -rf "$PROJ_DIR/model/rwkv-v5.pth" || true
-wget -nv -c -O "$PROJ_DIR/model/rwkv-v5.pth" "$RWKV_PTH_URL"
+
+# Optimizing for huggingface, detect if it starts with "https://huggingface.co/"
+# ends with a .pth / .pth?download=true and contains resolve/blob (in the middle)
+#
+# Eg: https://huggingface.co/BlinkDL/rwkv-5-world/resolve/main/RWKV-5-World-1B5-v2-20231025-ctx4096.pth?download=true
+# Eg: https://huggingface.co/BlinkDL/rwkv-5-world/blob/commithash/RWKV-5-World-1B5-v2-20231025-ctx4096.pth
+#
+# We use this to reduce the amount of repeated download via the local HF cache
+if [[ "$RWKV_PTH_URL" == "https://huggingface.co/"*".pth" ]] || [[ "$RWKV_PTH_URL" == "https://huggingface.co/"*".pth?download=true" ]]; then
+   
+    echo "### Detected huggingface URL"
+    
+    # Get the repo path, commit
+    # and the file path
+    if [[ "$RWKV_PTH_URL" == "https://huggingface.co/"*"/blob/"* ]]; then
+        REPO_PATH=$(echo "$RWKV_PTH_URL"   | awk -F 'https://huggingface.co/' '{print $2}' | awk -F '/blob/' '{print $1}')
+        COMMIT_HASH=$(echo "$RWKV_PTH_URL" | awk -F '/blob/' '{print $2}'                  | awk -F '/' '{print $1}')
+        FILE_PATH=$(echo "$RWKV_PTH_URL"   | awk -F "/blob/$COMMIT_HASH/" '{print $2}'     | awk -F '.pth' '{print $1}').pth
+    else
+        REPO_PATH=$(echo "$RWKV_PTH_URL"   | awk -F 'https://huggingface.co/' '{print $2}' | awk -F '/resolve/' '{print $1}')
+        COMMIT_HASH=$(echo "$RWKV_PTH_URL" | awk -F '/resolve/' '{print $2}'               | awk -F '/' '{print $1}')
+        FILE_PATH=$(echo "$RWKV_PTH_URL"   | awk -F "/resolve/$COMMIT_HASH/" '{print $2}'  | awk -F '.pth' '{print $1}').pth
+    fi
+
+    # Filename from the file path, note it maybe nested in multiple directories
+    FILE_NAME=$(basename $FILE_PATH)
+    
+    # Repo and file
+    echo "### Repo: $REPO_PATH"
+    echo "### Commit: $COMMIT_HASH"
+    echo "### File path: $FILE_PATH"
+    echo "### File name: $FILE_NAME"
+
+    # Download via huggerface-cli
+    # ---
+    # rm -rf "$PROJ_DIR/model/rwkv-v5.pth" || true
+
+    # Preload the file into the HF cache
+    huggingface-cli download "$REPO_PATH" "$FILE_PATH"
+
+    # Copy the file from the cache into the model folder
+    rm "$FILE_NAME" || true
+    huggingface-cli download --local-dir "./" --local-dir-use-symlinks False "$REPO_PATH" "$FILE_PATH"
+
+    # Move it as rwkv-v5.pth
+    mv "$FILE_NAME" "rwkv-v5.pth"
+
+else 
+    # Download the file
+    # ---
+
+    rm -rf "$PROJ_DIR/model/rwkv-v5.pth" || true
+    wget -nv -c -O "$PROJ_DIR/model/rwkv-v5.pth" "$RWKV_PTH_URL"
+
+fi
+
 echo "### Downloaded the model"
 
 # Get the file size

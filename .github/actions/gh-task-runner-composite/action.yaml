@@ -80,7 +80,7 @@ runs:
       shell: bash
       run: |
         # Download and convert the model
-        ./gh-task-runner/prepare-rwkv-v5-pth.sh ${{ inputs.rwkv5_file_url }}
+        ./gh-task-runner/prepare-rwkv-v5-pth.sh "${{ inputs.rwkv5_file_url }}"
 
         # Ensure we are in the proper directory
         cd ${{ github.workspace }}
