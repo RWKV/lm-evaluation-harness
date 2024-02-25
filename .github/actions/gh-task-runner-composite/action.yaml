@@ -50,7 +50,7 @@ runs:
     # Dependencies setup
     - uses: actions/setup-python@v5
       with:
-        python-version: '3.12' 
+        python-version: '3.10' 
     
     - name: Install dependencies / setup project
       shell: bash
@@ -220,13 +220,14 @@ runs:
     ########################################################################
     - name: Install B2
       shell: bash
-      if: ${{ inputs.upload_output }}
+      if: ${{ inputs.upload_output }} && success()
       run: |
         # Install B2
         python -m pip install -U b2
     - name: Upload to B2
       shell: bash
-      if: ${{ inputs.upload_output }}
+      # Upload if configured and the task was successful
+      if: ${{ inputs.upload_output }} && success()
       run: |
         # Upload to backblaze
         b2 sync ./upload/ $B2_PATH_LM_EVAL_OUTPUT
