@@ -99,7 +99,7 @@ runs:
           RWKV5_TEST_NAME="${{ inputs.rwkv5_test_name }}"
         fi
 
-        mv ./model/TEST_MODEL_FILE "./rwkv-x-dev/$RWKV5_TEST_NAME"
+        mv ./model/TEST_MODEL "./rwkv-x-dev/$RWKV5_TEST_NAME"
         echo "Model moved to ./rwkv-x-dev/$RWKV5_TEST_NAME"
 
     - name: Run Task
