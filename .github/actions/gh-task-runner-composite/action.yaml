@@ -93,8 +93,8 @@ runs:
         # Get the final task to run
         TASK_TO_RUN=${{ inputs.run_task }}
 
-        # Get the pretrained model path, rwkv5_test_name is set
-        if [ -n "${{ inputs.rwkv5_test_name }}" ]; then
+        # Get the pretrained model path, rwkv5_file_url is set
+        if [ -n "${{ inputs.rwkv5_file_url }}" ]; then
           PRETRAINED_MODEL="./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
         else
           PRETRAINED_MODEL=${{ inputs.model_hf_repo }}
