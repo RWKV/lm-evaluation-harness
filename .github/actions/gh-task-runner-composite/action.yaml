@@ -64,8 +64,10 @@ runs:
         python -m pip install .
         python -m pip install -e .
 
+        # Fix some HF dependencies issues
+        python -m pip install transformers accelerate setuptools
         # Needed for ifeval
-        python -m pip install langdetect immutabledict 
+        python -m pip install langdetect immutabledict
         # Needed for some models
         python -m pip install einops
         # Needed for olmo model
