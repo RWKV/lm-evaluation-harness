@@ -173,9 +173,20 @@ runs:
       shell: bash
       if: always()
       run: |
-        # Get the pretrained model path, rwkv5_test_name is set
-        if [ -n "${{ inputs.rwkv5_test_name }}" ]; then
-          PRETRAINED_MODEL="rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
+        # Get the pretrained model path, rwkv5_file_url is set
+        if [ -n "${{ inputs.rwkv5_file_url }}" ]; then
+        
+          # Compute the test model name, if `${{ inputs.rwkv5_test_name }}` == TEST_MODEL_FILE or is blank
+          if [ "${{ inputs.rwkv5_test_name }}" == "TEST_MODEL_FILE" ] || [ -z "${{ inputs.rwkv5_test_name }}" ]; then
+            # Remove any ?args after the .pth
+            RWKV5_TEST_NAME=$(basename "${{ inputs.rwkv5_file_url }}" | sed 's/\?.*//')
+
+            # Get the model name, from the URL (the last name.path)
+            RWKV5_TEST_NAME=$(basename "${RWKV5_TEST_NAME}" .pth)
+          else
+            RWKV5_TEST_NAME="${{ inputs.rwkv5_test_name }}"
+          fi
+
         else
           PRETRAINED_MODEL=${{ inputs.model_hf_repo }}
         fi
