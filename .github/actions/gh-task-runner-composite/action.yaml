@@ -114,6 +114,7 @@ runs:
         TASK_TO_RUN=${{ inputs.run_task }}
 
         # Get the pretrained model path, rwkv5_file_url is set
+        IS_CUSTOM_MODEL=0
         if [ -n "${{ inputs.rwkv5_file_url }}" ]; then
 
           # Compute the test model name, if `${{ inputs.rwkv5_test_name }}` == TEST_MODEL_FILE or is blank
@@ -128,6 +129,7 @@ runs:
           fi
 
           PRETRAINED_MODEL="./rwkv-x-dev/$RWKV5_TEST_NAME"
+          IS_CUSTOM_MODEL=1
         else
           PRETRAINED_MODEL=${{ inputs.model_hf_repo }}
         fi
@@ -153,11 +155,19 @@ runs:
           set -o pipefail
 
           # Run it
-          accelerate launch -m lm_eval --model hf \
-          --model_args pretrained=$PRETRAINED_MODEL,${{ inputs.model_args }} \
-          --tasks $TASK_TO_RUN \
-          --batch_size ${{ inputs.batch_size }} \
-          --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
+          if [ $IS_CUSTOM_MODEL -eq 1 ]; then
+            lm_eval --model hf \
+            --model_args model_path=$PRETRAINED_MODEL,${{ inputs.model_args }} \
+            --tasks $TASK_TO_RUN \
+            --batch_size ${{ inputs.batch_size }} \
+            --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
+          else
+            accelerate launch -m lm_eval --model hf \
+            --model_args pretrained=$PRETRAINED_MODEL,${{ inputs.model_args }} \
+            --tasks $TASK_TO_RUN \
+            --batch_size ${{ inputs.batch_size }} \
+            --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
+          fi
         fi
 
     # ########################################################################
