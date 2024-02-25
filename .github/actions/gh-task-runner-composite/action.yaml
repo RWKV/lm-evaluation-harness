@@ -58,7 +58,7 @@ runs:
         # Install apt-get dependencies
         apt-get update
         apt-get install -y bc
-        
+
         # Basic dependencies install, and output setup
         mkdir -p ./output
         python -m pip install .
@@ -90,17 +90,17 @@ runs:
       shell: bash
       run: |
         # Get the final task to run
-        task_to_run=${{ inputs.run_task }}
+        TASK_TO_RUN=${{ inputs.run_task }}
 
         # Get the pretrained model path, rwkv5_test_name is set
         if [ -n "${{ inputs.rwkv5_test_name }}" ]; then
-          pretrained_model="./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
+          PRETRAINED_MODEL="./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
         else
-          pretrained_model=${{ inputs.model_hf_repo }}
+          PRETRAINED_MODEL=${{ inputs.model_hf_repo }}
         fi
 
         echo "# ------------------------------"
-        echo "# Running Task : $task_to_run"
+        echo "# Running Task : $TASK_TO_RUN"
         echo "# ------------------------------"
 
         # Check if the few shot setting is larger or euqal to 0
@@ -110,8 +110,8 @@ runs:
 
           # Run it
           accelerate launch -m lm_eval --model hf \
-          --model_args pretrained=$pretrained_model,${{ inputs.model_args }} \
-          --tasks $task_to_run \
+          --model_args pretrained=$PRETRAINED_MODEL,${{ inputs.model_args }} \
+          --tasks $TASK_TO_RUN \
           --batch_size ${{ inputs.batch_size }} \
           --num_fewshot ${{ inputs.num_fewshot }} \
           --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
@@ -121,8 +121,8 @@ runs:
 
           # Run it
           accelerate launch -m lm_eval --model hf \
-          --model_args pretrained=${{ inputs.model_hf_repo }},${{ inputs.model_args }} \
-          --tasks $task_to_run \
+          --model_args pretrained=$PRETRAINED_MODEL,${{ inputs.model_args }} \
+          --tasks $TASK_TO_RUN \
           --batch_size ${{ inputs.batch_size }} \
           --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
         fi
@@ -145,8 +145,15 @@ runs:
       shell: bash
       if: always()
       run: |
+        # Get the pretrained model path, rwkv5_test_name is set
+        if [ -n "${{ inputs.rwkv5_test_name }}" ]; then
+          PRETRAINED_MODEL="./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
+        else
+          PRETRAINED_MODEL=${{ inputs.model_hf_repo }}
+        fi
+
         CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
-        HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}-${{ inputs.backend }}/"
+        HF_SUBDIR_PATH="$PRETRAINED_MODEL/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}-${{ inputs.backend }}/"
         
         # Move the files
         mkdir -p "./upload/$HF_SUBDIR_PATH"
