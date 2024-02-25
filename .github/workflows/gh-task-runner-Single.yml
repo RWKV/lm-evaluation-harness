@@ -1709,6 +1709,14 @@ on:
         - 40
         - 48
         - 80
+      rwkv5_file_url:
+        description: 'Model file URL (for rwkv5 .pth eval)'
+        default: ''
+        required: false
+      rwkv5_test_name:
+        description: 'Model dev test name (for test)'
+        default: 'TEST_MODEL'
+        required: false
       upload_output:
         description: 'Upload to HF / B2'
         required: false
@@ -1757,22 +1765,24 @@ jobs:
           model_args: ${{ github.event.inputs.model_args }}
           batch_size: ${{ github.event.inputs.batch_size }}
           backend: ${{ github.event.inputs.backend }}
-          # upload_output: ${{ github.event.inputs.upload_output }}
+          rwkv5_file_url: ${{ github.event.inputs.rwkv5_file_url }}
+          rwkv5_test_name: ${{ github.event.inputs.rwkv5_test_name }}
+          upload_output: ${{ github.event.inputs.upload_output }}
 
-  upload_output:
-    name: "Upload to HF / B2"
-    needs: gh-task-runner
-    runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.upload_output }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Run the task
-        uses: ./.github/actions/gh-upload-output
-        with:
-          run_task: ${{ github.event.inputs.custom_task || github.event.inputs.run_task }}
-          num_fewshot: ${{ github.event.inputs.num_fewshot }}
-          model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
-          model_args: ${{ github.event.inputs.model_args }}
-          batch_size: ${{ github.event.inputs.batch_size }}
-          backend: ${{ github.event.inputs.backend }}
+  # upload_output:
+  #   name: "Upload to HF / B2"
+  #   needs: gh-task-runner
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.event.inputs.upload_output }}
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
+  #     - name: Run the task
+  #       uses: ./.github/actions/gh-upload-output
+  #       with:
+  #         run_task: ${{ github.event.inputs.custom_task || github.event.inputs.run_task }}
+  #         num_fewshot: ${{ github.event.inputs.num_fewshot }}
+  #         model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
+  #         model_args: ${{ github.event.inputs.model_args }}
+  #         batch_size: ${{ github.event.inputs.batch_size }}
+  #         backend: ${{ github.event.inputs.backend }}

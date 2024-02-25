@@ -47,6 +47,14 @@ on:
         description: 'num_fewshot setting (ignored if < 0)'
         required: true
         default: -1
+      rwkv5_file_url:
+        description: 'Model file URL (for rwkv5 .pth eval)'
+        default: ''
+        required: false
+      rwkv5_test_name:
+        description: 'Model dev test name (for test)'
+        default: 'TEST_MODEL'
+        required: false
       upload_output:
         description: 'Upload to HF / B2'
         required: false
@@ -197,6 +205,8 @@ jobs:
           model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
           model_args: ${{ github.event.inputs.model_args }}
           batch_size: ${{ github.event.inputs.batch_size }}
+          rwkv5_file_url: ${{ github.event.inputs.rwkv5_file_url }}
+          rwkv5_test_name: ${{ github.event.inputs.rwkv5_test_name }}
           upload_output: ${{ github.event.inputs.upload_output }}
 
   # upload_output:
