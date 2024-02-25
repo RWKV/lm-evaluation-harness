@@ -112,7 +112,8 @@ echo "### Converted the model, at ./model/hf-format-output/"
 
 # Copy the converted model
 cd "$PROJ_DIR/model"
-rm -rf "./TEST_MODEL"
+rm -rf "./TEST_MODEL/*"
+mkdir -p "./TEST_MODEL"
 
 # Copy the test ref
 cp "$PROJ_DIR/model/$REF_REPO_NAME" "$PROJ_DIR/model/TEST_MODEL"
