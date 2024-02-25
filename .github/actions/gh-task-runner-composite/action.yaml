@@ -25,7 +25,7 @@ inputs:
     required: false
   rwkv5_test_name:
     description: 'Model dev test name (for test)'
-    default: 'TEST_MODEL'
+    default: 'TEST_MODEL_FILE'
     required: false
   batch_size:
     description: 'Batch Size'
@@ -87,8 +87,20 @@ runs:
 
         # Move the test model to the right location
         mkdir -p ./rwkv-x-dev
-        mv ./model/TEST_MODEL "./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
-        echo "Model moved to ./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
+
+        # Compute the test model name, if `${{ inputs.rwkv5_test_name }}` == TEST_MODEL_FILE or is blank
+        if [ "${{ inputs.rwkv5_test_name }}" == "TEST_MODEL_FILE" ] || [ -z "${{ inputs.rwkv5_test_name }}" ]; then
+          # Remove any ?args after the .pth
+          RWKV5_TEST_NAME=$(basename "${{ inputs.rwkv5_file_url }}" | sed 's/\?.*//')
+
+          # Get the model name, from the URL (the last name.path)
+          RWKV5_TEST_NAME=$(basename "${RWKV5_TEST_NAME}" .pth)
+        else
+          RWKV5_TEST_NAME="${{ inputs.rwkv5_test_name }}"
+        fi
+
+        mv ./model/TEST_MODEL_FILE "./rwkv-x-dev/$RWKV5_TEST_NAME"
+        echo "Model moved to ./rwkv-x-dev/$RWKV5_TEST_NAME"
 
     - name: Run Task
       shell: bash
@@ -98,7 +110,19 @@ runs:
 
         # Get the pretrained model path, rwkv5_file_url is set
         if [ -n "${{ inputs.rwkv5_file_url }}" ]; then
-          PRETRAINED_MODEL="./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
+
+          # Compute the test model name, if `${{ inputs.rwkv5_test_name }}` == TEST_MODEL_FILE or is blank
+          if [ "${{ inputs.rwkv5_test_name }}" == "TEST_MODEL_FILE" ] || [ -z "${{ inputs.rwkv5_test_name }}" ]; then
+            # Remove any ?args after the .pth
+            RWKV5_TEST_NAME=$(basename "${{ inputs.rwkv5_file_url }}" | sed 's/\?.*//')
+
+            # Get the model name, from the URL (the last name.path)
+            RWKV5_TEST_NAME=$(basename "${RWKV5_TEST_NAME}" .pth)
+          else
+            RWKV5_TEST_NAME="${{ inputs.rwkv5_test_name }}"
+          fi
+
+          PRETRAINED_MODEL="./rwkv-x-dev/$RWKV5_TEST_NAME"
         else
           PRETRAINED_MODEL=${{ inputs.model_hf_repo }}
         fi

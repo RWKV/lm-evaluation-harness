@@ -49,7 +49,7 @@ on:
         required: false
       rwkv5_test_name:
         description: 'Model dev test name (for test)'
-        default: 'TEST_MODEL'
+        default: 'TEST_MODEL_FILE'
         required: false
       num_fewshot:
         description: 'num_fewshot setting (ignored if < 0)'
