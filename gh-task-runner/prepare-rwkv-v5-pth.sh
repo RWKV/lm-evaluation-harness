@@ -117,7 +117,9 @@ elif (( $(echo "$MODEL_SIZE_MB > 2000" | bc -l) )); then
 #     MODEL_SIZE="169M"
 else
     # Throw an error
+    echo "###"
     echo "### [ERROR]: Model size unsupported: $MODEL_SIZE_MB MB"
+    echo "###"
     exit 1
 fi
 echo "### Model size: $MODEL_SIZE_MB MB / $MODEL_SIZE"
