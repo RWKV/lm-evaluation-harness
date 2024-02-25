@@ -187,6 +187,8 @@ runs:
             RWKV5_TEST_NAME="${{ inputs.rwkv5_test_name }}"
           fi
 
+          PRETRAINED_MODEL="rwkv-x-dev/$RWKV5_TEST_NAME"
+
         else
           PRETRAINED_MODEL=${{ inputs.model_hf_repo }}
         fi
