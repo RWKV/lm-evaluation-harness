@@ -55,6 +55,10 @@ runs:
     - name: Install dependencies / setup project
       shell: bash
       run: |
+        # Install apt-get dependencies
+        apt-get update
+        apt-get install -y bc
+        
         # Basic dependencies install, and output setup
         mkdir -p ./output
         python -m pip install .
