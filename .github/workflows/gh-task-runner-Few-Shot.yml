@@ -113,7 +113,7 @@ jobs:
             num_fewshot: 5
           
     # Name of the job
-    name: "[${{ matrix.run_task }} - fs:${{ matrix.num_fewshot }}] ${{ github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
+    name: "[${{ matrix.run_task }} - fs:${{ matrix.num_fewshot }}] ${{ github.event.inputs.rwkv5_file_url && github.event.inputs.rwkv5_test_name || github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
 
     # Due to github worker hard limitation, of 24 hours
     # we apply a timeout of 23 hours instead.
