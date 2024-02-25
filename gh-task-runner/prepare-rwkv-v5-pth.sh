@@ -35,7 +35,7 @@ fi
 # Download the model
 echo "### Downloading the model from $RWKV_PTH_URL"
 rm "$PROJ_DIR/model/rwkv-v5.pth"
-wget -O "$PROJ_DIR/model/rwkv-v5.pth" "$RWKV_PTH_URL"
+wget -nv -O "$PROJ_DIR/model/rwkv-v5.pth" "$RWKV_PTH_URL"
 echo "### Downloaded the model"
 
 # Get the file size
