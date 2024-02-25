@@ -82,6 +82,9 @@ runs:
         # Download and convert the model
         ./gh-task-runner/prepare-rwkv-v5-pth.sh ${{ inputs.rwkv5_file_url }}
 
+        # Ensure we are in the proper directory
+        cd ${{ github.workspace }}
+
         # Move the test model to the right location
         mkdir -p ./rwkv-x-dev
         mv ./model/TEST_MODEL "./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"

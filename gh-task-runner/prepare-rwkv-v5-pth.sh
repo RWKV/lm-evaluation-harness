@@ -124,3 +124,6 @@ mv ./hf-format-output/pytorch_model* "$PROJ_DIR/model/TEST_MODEL/"
 
 # The final model
 echo "### Copied the model to $PROJ_DIR/model/TEST_MODEL/"
+
+## Reset to the project directory
+cd "$PROJ_DIR"
