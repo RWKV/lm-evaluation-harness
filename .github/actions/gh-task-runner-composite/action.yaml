@@ -102,7 +102,10 @@ runs:
         fi
 
         mv ./model/TEST_MODEL "./rwkv-x-dev/$RWKV5_TEST_NAME"
-        echo "Model moved to ./rwkv-x-dev/$RWKV5_TEST_NAME"
+        echo "### Model moved to ./rwkv-x-dev/$RWKV5_TEST_NAME"
+
+        # List the files
+        ls -la "./rwkv-x-dev/$RWKV5_TEST_NAME"
 
     - name: Run Task
       shell: bash
