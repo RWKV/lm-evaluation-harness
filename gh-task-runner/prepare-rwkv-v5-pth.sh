@@ -27,6 +27,7 @@ mkdir -p ./model
 cd ./model
 
 # Clone the HF conversion repo, if not already cloned
+echo "### Getting RWKV World HF repo"
 if [ ! -d RWKV-World-HF-Tokenizer ]; then
     git clone https://github.com/BBuf/RWKV-World-HF-Tokenizer.git RWKV-World-HF-Tokenizer
 else
@@ -37,8 +38,8 @@ fi
 
 # Download the model
 echo "### Downloading the model from $RWKV_PTH_URL"
-rm -rf "$PROJ_DIR/model/rwkv-v5.pth" || true
-wget -nvc -O "$PROJ_DIR/model/rwkv-v5.pth" "$RWKV_PTH_URL"
+# rm -rf "$PROJ_DIR/model/rwkv-v5.pth" || true
+wget -nv -c -O "$PROJ_DIR/model/rwkv-v5.pth" "$RWKV_PTH_URL"
 echo "### Downloaded the model"
 
 # Get the file size
@@ -95,8 +96,8 @@ fi
 cd "$PROJ_DIR/model"
 
 # Prepare the output folder
+rm -rf ./hf-format-output || true
 mkdir -p ./hf-format-output/
-rm -rf ./hf-format-output/* || true
 
 # Convert the model
 cd RWKV-World-HF-Tokenizer/scripts
@@ -115,11 +116,10 @@ echo "### Converted the model, at ./model/hf-format-output/"
 
 # Copy the converted model
 cd "$PROJ_DIR/model"
-rm -rf "./TEST_MODEL/*" || true
-mkdir -p "./TEST_MODEL"
+rm -rf "./TEST_MODEL" || true
 
 # Copy the test ref
-cp -r "$PROJ_DIR/model/$REF_REPO_NAME/*" "$PROJ_DIR/model/TEST_MODEL"
+cp -r "$PROJ_DIR/model/$REF_REPO_NAME" "$PROJ_DIR/model/TEST_MODEL"
 mv ./hf-format-output/pytorch_model* "$PROJ_DIR/model/TEST_MODEL/"
 
 # The final model
