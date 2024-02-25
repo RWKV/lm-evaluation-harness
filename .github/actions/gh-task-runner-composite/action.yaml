@@ -85,7 +85,7 @@ runs:
         ./gh-task-runner/prepare-rwkv-v5-pth.sh "${{ inputs.rwkv5_file_url }}"
 
         # Ensure we are in the proper directory
-        cd ${{ github.workspace }}
+        cd "${{ github.workspace }}"
 
         # Move the test model to the right location
         mkdir -p ./rwkv-x-dev
@@ -94,6 +94,9 @@ runs:
         if [ "${{ inputs.rwkv5_test_name }}" == "TEST_MODEL_FILE" ] || [ -z "${{ inputs.rwkv5_test_name }}" ]; then
           # Remove any ?args after the .pth
           RWKV5_TEST_NAME=$(basename "${{ inputs.rwkv5_file_url }}" | sed 's/\?.*//')
+
+          # Replace any "." with "_"
+          RWKV5_TEST_NAME=$(echo $RWKV5_TEST_NAME | sed 's/\./_/g')
 
           # Get the model name, from the URL (the last name.path)
           RWKV5_TEST_NAME=$(basename "${RWKV5_TEST_NAME}" .pth)
@@ -113,6 +116,9 @@ runs:
         # Get the final task to run
         TASK_TO_RUN=${{ inputs.run_task }}
 
+        # Ensure we are in the proper directory
+        cd "${{ github.workspace }}"
+
         # Get the pretrained model path, rwkv5_file_url is set
         IS_CUSTOM_MODEL=0
         if [ -n "${{ inputs.rwkv5_file_url }}" ]; then
@@ -121,6 +127,9 @@ runs:
           if [ "${{ inputs.rwkv5_test_name }}" == "TEST_MODEL_FILE" ] || [ -z "${{ inputs.rwkv5_test_name }}" ]; then
             # Remove any ?args after the .pth
             RWKV5_TEST_NAME=$(basename "${{ inputs.rwkv5_file_url }}" | sed 's/\?.*//')
+
+            # Replace any "." with "_"
+            RWKV5_TEST_NAME=$(echo $RWKV5_TEST_NAME | sed 's/\./_/g')
 
             # Get the model name, from the URL (the last name.path)
             RWKV5_TEST_NAME=$(basename "${RWKV5_TEST_NAME}" .pth)
@@ -155,20 +164,11 @@ runs:
           set -o pipefail
 
           # Run it
-          if [ $IS_CUSTOM_MODEL -eq 1 ]; then
-            # Trying to isolate down a bug with accelerate + lm_eval + custom model
-            lm_eval --model hf \
-            --model_args pretrained=$PRETRAINED_MODEL,${{ inputs.model_args }} \
-            --tasks $TASK_TO_RUN \
-            --batch_size ${{ inputs.batch_size }} \
-            --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
-          else
-            accelerate launch -m lm_eval --model hf \
-            --model_args pretrained=$PRETRAINED_MODEL,${{ inputs.model_args }} \
-            --tasks $TASK_TO_RUN \
-            --batch_size ${{ inputs.batch_size }} \
-            --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
-          fi
+          accelerate launch -m lm_eval --model hf \
+          --model_args pretrained=$PRETRAINED_MODEL,${{ inputs.model_args }} \
+          --tasks $TASK_TO_RUN \
+          --batch_size ${{ inputs.batch_size }} \
+          --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
         fi
 
     # ########################################################################
@@ -199,6 +199,9 @@ runs:
 
             # Get the model name, from the URL (the last name.path)
             RWKV5_TEST_NAME=$(basename "${RWKV5_TEST_NAME}" .pth)
+
+            # Replace any "." with "_"
+            RWKV5_TEST_NAME=$(echo $RWKV5_TEST_NAME | sed 's/\./_/g')
           else
             RWKV5_TEST_NAME="${{ inputs.rwkv5_test_name }}"
           fi
