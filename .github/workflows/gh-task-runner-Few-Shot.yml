@@ -22,16 +22,16 @@ on:
         description: 'Batch Size'
         required: true
         default: 'auto'
-      backend:
-        description: 'Backend to use'
-        required: true
-        default: 'nvidia-gpu'
-        type: choice
-        options:
-        - nvidia-gpu
-        - intel-gpu
-        - amd-gpu
-        - any-gpu
+      # backend:
+      #   description: 'Backend to use'
+      #   required: true
+      #   default: 'nvidia-gpu'
+      #   type: choice
+      #   options:
+      #   - nvidia-gpu
+      #   - intel-gpu
+      #   - amd-gpu
+      #   - any-gpu
       gpu_vram:
         description: 'Minimum GPU VRAM (ignored for MPS)'
         required: true
@@ -43,6 +43,14 @@ on:
         - 40
         - 48
         - 80
+      rwkv5_file_url:
+        description: 'Model file URL (for rwkv5 .pth eval)'
+        default: ''
+        required: false
+      rwkv5_test_name:
+        description: 'Model dev test name (for test)'
+        default: 'TEST_MODEL'
+        required: false
       upload_output:
         description: 'Upload to HF / B2'
         required: false
