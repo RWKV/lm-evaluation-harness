@@ -112,7 +112,7 @@ jobs:
 
     # Select the type of runner that the job will run on
     runs-on: 
-      - ${{ github.event.inputs.backend }}
+      - nvidia-gpu
       - gpu-vram-${{ github.event.inputs.gpu_vram }}
       # - gpu-count-any
 
@@ -149,5 +149,5 @@ jobs:
   #         model_hf_repo: ${{ github.event.inputs.model_hf_repo }}
   #         model_args: ${{ github.event.inputs.model_args }}
   #         batch_size: ${{ github.event.inputs.batch_size }}
-  #         backend: ${{ github.event.inputs.backend }}
+  #         backend: nvidia-gpu
           
