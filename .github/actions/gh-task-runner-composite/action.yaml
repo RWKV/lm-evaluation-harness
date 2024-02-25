@@ -156,7 +156,7 @@ runs:
 
           # Run it
           if [ $IS_CUSTOM_MODEL -eq 1 ]; then
-            # Trying to isolate down a bug with ACCELERATE
+            # Trying to isolate down a bug with accelerate + lm_eval + custom model
             lm_eval --model hf \
             --model_args pretrained=$PRETRAINED_MODEL,${{ inputs.model_args }} \
             --tasks $TASK_TO_RUN \
