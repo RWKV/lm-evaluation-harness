@@ -19,6 +19,14 @@ inputs:
     description: 'Model Arguments (ie: dtype="float16")'
     default: 'dtype=bfloat16,trust_remote_code=True'
     required: false
+  rwkv5_file_url:
+    description: 'Model file URL (for rwkv5 .pth eval)'
+    default: ''
+    required: false
+  rwkv5_test_name:
+    description: 'Model dev test name (for test)'
+    default: 'TEST_MODEL'
+    required: false
   batch_size:
     description: 'Batch Size'
     default: 'auto'
@@ -63,17 +71,29 @@ runs:
         chmod +x ./gh-task-runner/*.sh
         ./gh-task-runner/hf-cache-setup.sh 
 
-    # - name: Download and convert the model
-    #   shell: bash
-    #   run: |
-    #     # Basic dependencies install, and output setup
+    - name: Download and convert the model
+      if: ${{ inputs.rwkv5_file_url != '' }}
+      shell: bash
+      run: |
+        # Download and convert the model
+        ./gh-task-runner/prepare-rwkv-v5-pth.sh ${{ inputs.rwkv5_file_url }}
 
+        # Move the test model to the right location
+        mkdir -p ./rwkv-x-dev
+        mv ./model/TEST_MODEL ./rwkv-x-dev/${{ inputs.rwkv5_test_name }}
 
     - name: Run Task
       shell: bash
       run: |
         # Get the final task to run
         task_to_run=${{ inputs.run_task }}
+
+        # Get the pretrained model path, rwkv5_test_name is set
+        if [ -n "${{ inputs.rwkv5_test_name }}" ]; then
+          pretrained_model="./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
+        else
+          pretrained_model=${{ inputs.model_hf_repo }}
+        fi
 
         echo "# ------------------------------"
         echo "# Running Task : $task_to_run"
@@ -86,7 +106,7 @@ runs:
 
           # Run it
           accelerate launch -m lm_eval --model hf \
-          --model_args pretrained=${{ inputs.model_hf_repo }},${{ inputs.model_args }} \
+          --model_args pretrained=$pretrained_model,${{ inputs.model_args }} \
           --tasks $task_to_run \
           --batch_size ${{ inputs.batch_size }} \
           --num_fewshot ${{ inputs.num_fewshot }} \

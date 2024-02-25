@@ -112,6 +112,11 @@ echo "### Converted the model, at ./model/hf-format-output/"
 
 # Copy the converted model
 cd "$PROJ_DIR/model"
-mv ./hf-format-output/pytorch_model* "$PROJ_DIR/model/$REF_REPO_NAME/"
+rm -rf "./TEST_MODEL"
 
-echo "### Copied the model to $PROJ_DIR/model/$REF_REPO_NAME/"
+# Copy the test ref
+cp "$PROJ_DIR/model/$REF_REPO_NAME" "$PROJ_DIR/model/TEST_MODEL"
+mv ./hf-format-output/pytorch_model* "$PROJ_DIR/model/TEST_MODEL/"
+
+# The final model
+echo "### Copied the model to $PROJ_DIR/model/TEST_MODEL/"
