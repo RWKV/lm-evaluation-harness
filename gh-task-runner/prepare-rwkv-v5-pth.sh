@@ -38,7 +38,7 @@ fi
 # Download the model
 echo "### Downloading the model from $RWKV_PTH_URL"
 rm -rf "$PROJ_DIR/model/rwkv-v5.pth" || true
-wget -nv -O "$PROJ_DIR/model/rwkv-v5.pth" "$RWKV_PTH_URL"
+wget -nvc -O "$PROJ_DIR/model/rwkv-v5.pth" "$RWKV_PTH_URL"
 echo "### Downloaded the model"
 
 # Get the file size
@@ -119,7 +119,7 @@ rm -rf "./TEST_MODEL/*" || true
 mkdir -p "./TEST_MODEL"
 
 # Copy the test ref
-cp -r "$PROJ_DIR/model/$REF_REPO_NAME" "$PROJ_DIR/model/TEST_MODEL"
+cp -r "$PROJ_DIR/model/$REF_REPO_NAME/*" "$PROJ_DIR/model/TEST_MODEL"
 mv ./hf-format-output/pytorch_model* "$PROJ_DIR/model/TEST_MODEL/"
 
 # The final model
