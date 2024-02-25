@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Properly bringing up errror
+set -e
+
 # Get the current script directories
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJ_DIR="$(dirname "$SCRIPT_DIR")"
