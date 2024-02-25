@@ -147,7 +147,7 @@ runs:
       run: |
         # Get the pretrained model path, rwkv5_test_name is set
         if [ -n "${{ inputs.rwkv5_test_name }}" ]; then
-          PRETRAINED_MODEL="./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
+          PRETRAINED_MODEL="rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
         else
           PRETRAINED_MODEL=${{ inputs.model_hf_repo }}
         fi
