@@ -28,13 +28,13 @@ cd ./model
 
 # Clone the HF conversion repo, if not already cloned
 echo "### Getting RWKV World HF repo"
-rm -rf RWKV-World-HF-Tokenizer || true
+# rm -rf RWKV-World-HF-Tokenizer || true
 if [ ! -d RWKV-World-HF-Tokenizer ]; then
     git clone https://github.com/PicoCreator/RWKV-World-HF-Tokenizer.git RWKV-World-HF-Tokenizer
-# else
-#     cd RWKV-World-HF-Tokenizer
-#     git pull
-#     cd ..
+else
+    cd RWKV-World-HF-Tokenizer
+    git pull
+    cd ..
 fi
 
 # Download the model
