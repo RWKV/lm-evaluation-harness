@@ -1706,7 +1706,7 @@ on:
         options:
         - 16
         - 24
-        - 40
+        # - 40
         - 48
         - 80
       rwkv5_file_url:
