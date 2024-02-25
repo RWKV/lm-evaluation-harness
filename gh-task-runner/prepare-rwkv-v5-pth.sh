@@ -37,7 +37,7 @@ fi
 
 # Download the model
 echo "### Downloading the model from $RWKV_PTH_URL"
-rm "$PROJ_DIR/model/rwkv-v5.pth"
+rm -rf "$PROJ_DIR/model/rwkv-v5.pth" || true
 wget -nv -O "$PROJ_DIR/model/rwkv-v5.pth" "$RWKV_PTH_URL"
 echo "### Downloaded the model"
 
@@ -87,7 +87,7 @@ if [ ! -d "$PROJ_DIR/model/$REF_REPO_NAME" ]; then
 
     # Remove the bin file
     cd "$PROJ_DIR/model/$REF_REPO_NAME"
-    rm -rf ./*.bin
+    rm -rf ./*.bin || true
 # else
 #     cd "$PROJ_DIR/model/$REF_REPO_NAME"
 #     git pull
@@ -96,7 +96,7 @@ cd "$PROJ_DIR/model"
 
 # Prepare the output folder
 mkdir -p ./hf-format-output/
-rm -rf ./hf-format-output/*
+rm -rf ./hf-format-output/* || true
 
 # Convert the model
 cd RWKV-World-HF-Tokenizer/scripts
@@ -115,7 +115,7 @@ echo "### Converted the model, at ./model/hf-format-output/"
 
 # Copy the converted model
 cd "$PROJ_DIR/model"
-rm -rf "./TEST_MODEL/*"
+rm -rf "./TEST_MODEL/*" || true
 mkdir -p "./TEST_MODEL"
 
 # Copy the test ref
