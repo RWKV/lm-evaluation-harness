@@ -55,14 +55,6 @@ on:
         description: 'num_fewshot setting (ignored if < 0)'
         required: true
         default: -1
-      rwkv5_file_url:
-        description: 'Model file URL (for rwkv5 .pth eval)'
-        default: ''
-        required: false
-      rwkv5_test_name:
-        description: 'Model dev test name (for test)'
-        default: 'TEST_MODEL'
-        required: false
       upload_output:
         description: 'Upload to HF / B2'
         required: false
