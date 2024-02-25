@@ -119,7 +119,7 @@ rm -rf "./TEST_MODEL/*" || true
 mkdir -p "./TEST_MODEL"
 
 # Copy the test ref
-cp "$PROJ_DIR/model/$REF_REPO_NAME" "$PROJ_DIR/model/TEST_MODEL"
+cp -r "$PROJ_DIR/model/$REF_REPO_NAME" "$PROJ_DIR/model/TEST_MODEL"
 mv ./hf-format-output/pytorch_model* "$PROJ_DIR/model/TEST_MODEL/"
 
 # The final model
