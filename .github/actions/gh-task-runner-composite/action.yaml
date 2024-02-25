@@ -84,7 +84,8 @@ runs:
 
         # Move the test model to the right location
         mkdir -p ./rwkv-x-dev
-        mv ./model/TEST_MODEL ./rwkv-x-dev/${{ inputs.rwkv5_test_name }}
+        mv ./model/TEST_MODEL "./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
+        echo "Model moved to ./rwkv-x-dev/${{ inputs.rwkv5_test_name }}"
 
     - name: Run Task
       shell: bash
