@@ -8,7 +8,6 @@ import scipy.stats
 import torch
 
 import lm_eval.evaluator
-import lm_eval.models.utils
 from lm_eval import tasks, utils
 
 
@@ -114,7 +113,7 @@ if __name__ == "__main__":
         batch_size=args.batch,
     )
     memory_stats()
-    lm_eval.models.utils.clear_torch_cache()
+    utils.clear_torch_cache()
     eval_logger.info("Memory stats cleared")
     memory_stats()
     results_hf = lm_eval.evaluator.simple_evaluate(
