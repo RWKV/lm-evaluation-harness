@@ -122,9 +122,11 @@ jobs:
 
           ### Slow tasks (>=1 hr on 4x3090)
           ### ----------------------------------------------------------------------------
-          - wmt14
+
+          # # These are already under the `translation` task
+          # - wmt14
           # - wmt14-*
-          - wmt16
+          # - wmt16
           # - wmt16-*
 
           # # This is a collection set (can skip)

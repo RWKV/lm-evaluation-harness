@@ -1,4 +1,4 @@
-name: GH Task Runner (Multi Lingual)
+name: GH Task Runner (RWKV-x-dev focused suite)
 on:
   workflow_dispatch:
     inputs:
@@ -88,6 +88,33 @@ jobs:
 
         # NOTE: There is a matrix limit of 256 on github
         run_task:
+          ### Main suite metrics to include
+          ### ----------------------------------------------------------------------------
+          - anli
+          - glue
+          - truthfulqa
+          - cmmlu
+          - lambada
+          - pythia
+          - mmlu
+          - blimp
+          - ai2_arc
+          # - arc_easy
+          # - arc_challenge
+          - logiqa
+          - winogrande
+          - openbookqa
+          - hellaswag
+          - copa
+          - sciq
+          - piqa
+
+          ### Slow suite metrics to include
+          ### ----------------------------------------------------------------------------
+          - triviaqa
+          - record
+          - nq_open
+
           ### Various multilang tasks
           ### ----------------------------------------------------------------------------
           - xcopa
