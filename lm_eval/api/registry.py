@@ -1,7 +1,6 @@
 import logging
-from typing import Callable, Dict
 
-import evaluate as hf_evaluate
+import evaluate
 
 from lm_eval.api.model import LM
 
@@ -76,7 +75,7 @@ def register_group(name):
 OUTPUT_TYPE_REGISTRY = {}
 METRIC_REGISTRY = {}
 METRIC_AGGREGATION_REGISTRY = {}
-AGGREGATION_REGISTRY: Dict[str, Callable[[], Dict[str, Callable]]] = {}
+AGGREGATION_REGISTRY = {}
 HIGHER_IS_BETTER_REGISTRY = {}
 
 DEFAULT_METRIC_REGISTRY = {
@@ -119,7 +118,7 @@ def register_metric(**args):
     return decorate
 
 
-def get_metric(name: str, hf_evaluate_metric=False) -> Callable:
+def get_metric(name, hf_evaluate_metric=False):
     if not hf_evaluate_metric:
         if name in METRIC_REGISTRY:
             return METRIC_REGISTRY[name]
@@ -129,7 +128,7 @@ def get_metric(name: str, hf_evaluate_metric=False) -> Callable:
             )
 
     try:
-        metric_object = hf_evaluate.load(name)
+        metric_object = evaluate.load(name)
         return metric_object.compute
     except Exception:
         eval_logger.error(
@@ -137,7 +136,7 @@ def get_metric(name: str, hf_evaluate_metric=False) -> Callable:
         )
 
 
-def register_aggregation(name: str):
+def register_aggregation(name):
     def decorate(fn):
         assert (
             name not in AGGREGATION_REGISTRY
@@ -149,21 +148,21 @@ def register_aggregation(name: str):
     return decorate
 
 
-def get_aggregation(name: str) -> Callable[[], Dict[str, Callable]]:
+def get_aggregation(name):
     try:
         return AGGREGATION_REGISTRY[name]
     except KeyError:
         eval_logger.warning(f"{name} not a registered aggregation metric!")
 
 
-def get_metric_aggregation(name: str) -> Callable[[], Dict[str, Callable]]:
+def get_metric_aggregation(name):
     try:
         return METRIC_AGGREGATION_REGISTRY[name]
     except KeyError:
         eval_logger.warning(f"{name} metric is not assigned a default aggregation!")
 
 
-def is_higher_better(metric_name) -> bool:
+def is_higher_better(metric_name):
     try:
         return HIGHER_IS_BETTER_REGISTRY[metric_name]
     except KeyError:

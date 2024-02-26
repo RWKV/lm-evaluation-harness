@@ -38,7 +38,7 @@ Homepage: https://allenai.org/data/arc
 #### Tasks
 
 * `arc_easy`
-* `arc_challenge`
+* `arc_challange`
 
 ### Checklist
 

@@ -7,10 +7,7 @@ class RegexFilter(Filter):
     """ """
 
     def __init__(
-        self,
-        regex_pattern: str = r"#### (\-?[0-9\.\,]+)",
-        group_select=0,
-        fallback: str = "[invalid]",
+        self, regex_pattern: str = r"#### (\-?[0-9\.\,]+)", fallback: str = "[invalid]"
     ) -> None:
         """
         pass a string `regex` to run `re.compile(r"regex")` on.
@@ -18,7 +15,6 @@ class RegexFilter(Filter):
         """
         self.regex_pattern = regex_pattern
         self.regex = re.compile(regex_pattern)
-        self.group_select = group_select
         self.fallback = fallback
 
     def apply(self, resps, docs):
@@ -29,12 +25,9 @@ class RegexFilter(Filter):
         def filter_set(inst):
             filtered = []
             for resp in inst:
-                match = self.regex.findall(resp)
+                match = self.regex.search(resp)
                 if match:
-                    match = match[self.group_select]
-                    if isinstance(match, tuple):
-                        match = [m for m in match if m][0]
-                    match = match.strip()
+                    match = match.group(1).strip()
                 else:
                     match = self.fallback
                 filtered.append(match)
