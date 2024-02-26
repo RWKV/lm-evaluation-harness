@@ -1,0 +1,119 @@
+name: Backblaze to Hugging Face Sync
+on:
+  workflow_dispatch:
+    inputs:
+      upload_output:
+        description: 'Upload to HF / B2'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  # HF repo to sync to
+  HF_REPO_SYNC: rwkv-x-dev/lm-eval-output
+
+  # Model HF repo
+  MODEL_HF_REPO: ${{ github.event.inputs.model_hf_repo }}
+
+  # HF / B2 sync settings
+  HUGGING_FACE_HUB_TOKEN: ${{secrets.HUGGING_FACE_HUB_TOKEN}}
+  B2_APPLICATION_KEY_ID: ${{secrets.B2_APPLICATION_KEY_ID}}
+  B2_APPLICATION_KEY: ${{secrets.B2_APPLICATION_KEY}}
+  B2_PATH_LM_EVAL_OUTPUT: ${{vars.B2_PATH_LM_EVAL_OUTPUT}}
+
+jobs:
+  gh-b2-to-hf-sync:
+    # Name of the job
+    name: "B2 to HF Sync"
+
+    # Due to github worker hard limitation, of 24 hours
+    # we apply a timeout of 23 hours instead.
+    timeout-minutes: 1380
+
+    # Select the type of runner that the job will run on
+    runs-on: 
+      - ubuntu-latest
+
+    # Actual task setup, and run steps
+    steps:
+      # Get and log the free space
+      - name: Get system free space (Before reclaim)
+        run: |
+          echo "Free space:"
+          df -h
+      
+      # Due to the docker image being > available space on the runner
+      # we need to do some optimization, to create more space.
+      # https://github.com/marketplace/actions/disk-space-reclaimer
+      # https://stackoverflow.com/questions/76294509/github-actions-docker-service-container-25gb-cannot-be-loaded
+      - name: Maximize build space
+        uses: insightsengineering/disk-space-reclaimer@v1
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tools-cache: true
+
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+          docker-images: true
+      
+      # Get and log the free space
+      - name: Get system free space (After reclaim)
+        run: |
+          echo "Free space:"
+          df -h
+
+      - name: Install dependencies / setup project
+        shell: bash
+        run: |
+          # Basic dependencies install, and output setup
+          python -m pip install -U setuptools
+          python -m pip install -U "huggingface_hub[cli]"
+          python -m pip install -U b2
+
+          # Install git LFS
+          git lfs install
+
+      - name: Cache Hugging Face repository
+        id: cache-hf-repo
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./lm-eval-output
+          key: huggingface/rwkv-x-dev/lm-eval-output/hash-${{ hashFiles('**') }}
+          # key: huggingface/rwkv-x-dev/lm-eval-output/hash-${{ steps.current-date.outputs.date }}
+          restore-keys: huggingface/rwkv-x-dev/lm-eval-output/hash-
+
+      - name: EITHER - Clone Hugging Face repository
+        if: steps.cache-hf-repo.outputs.cache-hit != 'true'
+        run: |
+          git lfs clone --depth 1 https://huggingface.co/datasets/rwkv-x-dev/lm-eval-output lm-eval-output
+
+      - name: OR - Pull latest changes from Hugging Face
+        if: steps.cache-hf-repo.outputs.cache-hit == 'true'
+        run: |
+          cd lm-eval-output && git reset --hard && git pull
+
+      # - name: Sync files from B2
+      #   run: |
+      #     cd lm-eval-output
+      #     b2 sync --skipNewer $B2_PATH_LM_EVAL_OUTPUT ./lm-eval-output
+      
+      # - name: Huggingface CLI login
+      #   shell: bash
+      #   run: |
+      #     huggingface-cli login --token $HUGGING_FACE_HUB_TOKEN --add-to-git-credential
+
+      # - name: Commit and push changes
+      #   run: |
+      #     cd lm-eval-output
+      #     git config --global user.email "devops@rwkv.com"
+      #     git config --global user.name "rwkv-x-dev"
+      #     git add . && git commit -m "[GHA] Auto-sync from B2"
+      #     git push
+

@@ -1,0 +1,248 @@
+# See https://docs.github.com/en/actions/creating-actions/creating-a-composite-action
+# for more information on how to create and use composite actions
+name: 'GH Task Runner Composite'
+description: 'Run your task with the various options provided, and into the output folder - does not checkout/upload'
+inputs:
+  run_task:
+    description: 'Task to run'
+    default: 'anli'
+    required: true
+  num_fewshot:
+    description: 'num_fewshot setting (ignored if < 0)'
+    default: -1
+    required: true
+  model_hf_repo:
+    description: 'Model Hugging Face Repository'
+    default: 'RWKV/rwkv-5-world-1b5'
+    required: true
+  model_args:
+    description: 'Model Arguments (ie: dtype="float16")'
+    default: 'dtype=bfloat16,trust_remote_code=True'
+    required: false
+  rwkv5_file_url:
+    description: 'Model file URL (for rwkv5 .pth eval)'
+    default: ''
+    required: false
+  rwkv5_test_name:
+    description: 'Model dev test name (for test)'
+    default: 'TEST_MODEL_FILE'
+    required: false
+  batch_size:
+    description: 'Batch Size'
+    default: 'auto'
+    required: true
+  backend:
+    description: 'Backend used'
+    default: 'nvidia-gpu'
+    required: true
+  upload_output:
+    description: 'Upload results to HF'
+    default: False
+    type: boolean
+runs:
+  using: "composite"
+  steps:
+    # If this fails fast, we know quickly to isolate a dead GPU node
+    - name: nvidia-smi check (for easy debugging)
+      shell: bash
+      run: nvidia-smi
+
+    # Dependencies setup
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11' 
+    
+    - name: Install dependencies / setup project
+      shell: bash
+      run: |
+        # Install apt-get dependencies
+        apt-get update
+        apt-get install -y bc
+
+        # Basic dependencies install, and output setup
+        mkdir -p ./output
+        python -m pip install .
+        python -m pip install -e .
+
+        # Fix some HF dependencies issues
+        python -m pip install transformers accelerate setuptools
+        # Needed for ifeval
+        python -m pip install langdetect immutabledict
+        # Needed for some models
+        python -m pip install einops
+        # Needed for olmo model
+        python -m pip install ai2-olmo
+
+        # Setup HF cache
+        chmod +x ./gh-task-runner/*.sh
+        ./gh-task-runner/hf-cache-setup.sh 
+
+    - name: Download and convert the model
+      if: ${{ inputs.rwkv5_file_url != '' }}
+      shell: bash
+      run: |
+        # Download and convert the model
+        ./gh-task-runner/prepare-rwkv-v5-pth.sh "${{ inputs.rwkv5_file_url }}"
+
+        # Ensure we are in the proper directory
+        cd "${{ github.workspace }}"
+
+        # Move the test model to the right location
+        mkdir -p ./rwkv-x-dev
+
+        # Compute the test model name, if `${{ inputs.rwkv5_test_name }}` == TEST_MODEL_FILE or is blank
+        if [ "${{ inputs.rwkv5_test_name }}" == "TEST_MODEL_FILE" ] || [ -z "${{ inputs.rwkv5_test_name }}" ]; then
+          # Remove any ?args after the .pth
+          RWKV5_TEST_NAME=$(basename "${{ inputs.rwkv5_file_url }}" | sed 's/\?.*//')
+
+          # Replace any "." with "_"
+          RWKV5_TEST_NAME=$(echo $RWKV5_TEST_NAME | sed 's/\./_/g')
+
+          # Get the model name, from the URL (the last name.path)
+          RWKV5_TEST_NAME=$(basename "${RWKV5_TEST_NAME}" .pth)
+        else
+          RWKV5_TEST_NAME="${{ inputs.rwkv5_test_name }}"
+        fi
+
+        mv ./model/TEST_MODEL "./rwkv-x-dev/$RWKV5_TEST_NAME"
+        echo "### Model moved to ./rwkv-x-dev/$RWKV5_TEST_NAME"
+
+        # List the files
+        ls -la "./rwkv-x-dev/$RWKV5_TEST_NAME"
+
+    - name: Run Task
+      shell: bash
+      run: |
+        # Get the final task to run
+        TASK_TO_RUN=${{ inputs.run_task }}
+
+        # Ensure we are in the proper directory
+        cd "${{ github.workspace }}"
+
+        # Get the pretrained model path, rwkv5_file_url is set
+        IS_CUSTOM_MODEL=0
+        if [ -n "${{ inputs.rwkv5_file_url }}" ]; then
+
+          # Compute the test model name, if `${{ inputs.rwkv5_test_name }}` == TEST_MODEL_FILE or is blank
+          if [ "${{ inputs.rwkv5_test_name }}" == "TEST_MODEL_FILE" ] || [ -z "${{ inputs.rwkv5_test_name }}" ]; then
+            # Remove any ?args after the .pth
+            RWKV5_TEST_NAME=$(basename "${{ inputs.rwkv5_file_url }}" | sed 's/\?.*//')
+
+            # Replace any "." with "_"
+            RWKV5_TEST_NAME=$(echo $RWKV5_TEST_NAME | sed 's/\./_/g')
+
+            # Get the model name, from the URL (the last name.path)
+            RWKV5_TEST_NAME=$(basename "${RWKV5_TEST_NAME}" .pth)
+          else
+            RWKV5_TEST_NAME="${{ inputs.rwkv5_test_name }}"
+          fi
+
+          PRETRAINED_MODEL="./rwkv-x-dev/$RWKV5_TEST_NAME"
+          IS_CUSTOM_MODEL=1
+        else
+          PRETRAINED_MODEL=${{ inputs.model_hf_repo }}
+        fi
+
+        echo "# ------------------------------"
+        echo "# Running Task : $TASK_TO_RUN"
+        echo "# ------------------------------"
+
+        # Check if the few shot setting is larger or euqal to 0
+        if [ ${{ inputs.num_fewshot }} -ge 0 ]; then
+          # Fail on pipe error
+          set -o pipefail
+
+          # Run it
+          accelerate launch -m lm_eval --model hf \
+          --model_args pretrained=$PRETRAINED_MODEL,${{ inputs.model_args }} \
+          --tasks $TASK_TO_RUN \
+          --batch_size ${{ inputs.batch_size }} \
+          --num_fewshot ${{ inputs.num_fewshot }} \
+          --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
+        else
+          # Fail on pipe error
+          set -o pipefail
+
+          # Run it
+          accelerate launch -m lm_eval --model hf \
+          --model_args pretrained=$PRETRAINED_MODEL,${{ inputs.model_args }} \
+          --tasks $TASK_TO_RUN \
+          --batch_size ${{ inputs.batch_size }} \
+          --log_samples --output_path ./output 2>&1 | tee -a ./output/taskrun.log
+        fi
+
+    # ########################################################################
+    # # We disable HF upload for large runs, as it WILL hit the rate limits
+    # ########################################################################
+    # - name: Upload outputs to HF
+    #   shell: bash
+    #   if: ${{ inputs.upload_output }}
+    #   run: |
+    #     CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
+    #     HF_SUBDIR_PATH="${{ env.MODEL_HF_REPO }}/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}/${{ inputs.backend }}/"
+    #     ./gh-task-runner/hf-upload-runner.sh "${{ env.HF_REPO_SYNC }}" "$HF_SUBDIR_PATH" "./output"
+
+    ########################################################################
+    # Instead we adjust the format for GH-Upload
+    ########################################################################
+    - name: Change to GH-Upload format
+      shell: bash
+      if: always()
+      run: |
+        # Get the pretrained model path, rwkv5_file_url is set
+        if [ -n "${{ inputs.rwkv5_file_url }}" ]; then
+        
+          # Compute the test model name, if `${{ inputs.rwkv5_test_name }}` == TEST_MODEL_FILE or is blank
+          if [ "${{ inputs.rwkv5_test_name }}" == "TEST_MODEL_FILE" ] || [ -z "${{ inputs.rwkv5_test_name }}" ]; then
+            # Remove any ?args after the .pth
+            RWKV5_TEST_NAME=$(basename "${{ inputs.rwkv5_file_url }}" | sed 's/\?.*//')
+
+            # Get the model name, from the URL (the last name.path)
+            RWKV5_TEST_NAME=$(basename "${RWKV5_TEST_NAME}" .pth)
+
+            # Replace any "." with "_"
+            RWKV5_TEST_NAME=$(echo $RWKV5_TEST_NAME | sed 's/\./_/g')
+          else
+            RWKV5_TEST_NAME="${{ inputs.rwkv5_test_name }}"
+          fi
+
+          PRETRAINED_MODEL="rwkv-x-dev/$RWKV5_TEST_NAME"
+
+        else
+          PRETRAINED_MODEL=${{ inputs.model_hf_repo }}
+        fi
+
+        CLEANED_TASK=$(echo "${{ inputs.run_task }}" | sed 's/\*/_/g')
+        HF_SUBDIR_PATH="$PRETRAINED_MODEL/$CLEANED_TASK/${{ inputs.model_args }}-num_fewshot=${{ inputs.num_fewshot }}-${{ inputs.backend }}/"
+        
+        # Move the files
+        mkdir -p "./upload/$HF_SUBDIR_PATH"
+        mv ./output/* "./upload/$HF_SUBDIR_PATH"
+
+    - name: Save output Files
+      uses: actions/upload-artifact@v3
+      # if: failure()
+      if: always()
+      with:
+        name: output-files
+        path: |
+          upload/*
+        retention-days: 90
+    
+    ########################################################################
+    # Upload to B2 if configured
+    ########################################################################
+    - name: Install B2
+      shell: bash
+      if: ${{ inputs.upload_output }} && success()
+      run: |
+        # Install B2
+        python -m pip install -U b2
+    - name: Upload to B2
+      shell: bash
+      # Upload if configured and the task was successful
+      if: ${{ inputs.upload_output }} && success()
+      run: |
+        # Upload to backblaze
+        b2 sync ./upload/ $B2_PATH_LM_EVAL_OUTPUT
+      
