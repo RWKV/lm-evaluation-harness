@@ -4,7 +4,7 @@ task: pile_arxiv
 dataset_path: EleutherAI/pile
 dataset_name: pile_arxiv
 output_type: loglikelihood_rolling
-test_split: train
+test_split: test
 doc_to_text: ""
 doc_to_target: "{{text}}"
 should_decontaminate: true
