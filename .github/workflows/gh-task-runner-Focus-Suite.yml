@@ -111,7 +111,7 @@ jobs:
 
           ### Slow suite metrics to include
           ### ----------------------------------------------------------------------------
-          - triviaqa
+          # - triviaqa
           - record
           - nq_open
 
