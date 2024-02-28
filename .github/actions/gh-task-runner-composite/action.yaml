@@ -72,6 +72,8 @@ runs:
         python -m pip install einops
         # Needed for olmo model
         python -m pip install ai2-olmo
+        # Needed for sealion model
+        python -m pip install sentencepiece
 
         # Setup HF cache
         chmod +x ./gh-task-runner/*.sh
