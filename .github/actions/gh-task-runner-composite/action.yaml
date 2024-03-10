@@ -79,6 +79,10 @@ runs:
         chmod +x ./gh-task-runner/*.sh
         ./gh-task-runner/hf-cache-setup.sh 
 
+        # Setup the HF hub, this additional step is needed due to GH env variable security rules
+        # see: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+        echo "HF_HOME=$HF_HOME" >> "$GITHUB_ENV"
+
     - name: Download and convert the model
       if: ${{ inputs.rwkv5_file_url != '' }}
       shell: bash
