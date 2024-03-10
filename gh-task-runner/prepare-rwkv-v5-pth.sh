@@ -84,7 +84,7 @@ if [[ "$RWKV_PTH_URL" == "https://huggingface.co/"*".pth" ]] || [[ "$RWKV_PTH_UR
     huggingface-cli download --local-dir "./" --local-dir-use-symlinks False "$REPO_PATH" "$FILE_PATH"
 
     # Move it as rwkv-v5.pth
-    mv "$FILE_NAME" "rwkv-v5.pth"
+    mv "$FILE_PATH" "rwkv-v5.pth"
 
 else 
     # Download the file
