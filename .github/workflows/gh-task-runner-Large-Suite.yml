@@ -99,7 +99,7 @@ jobs:
           ### Medium Slow tasks (>=15 mins on 4x3090)
           ### ----------------------------------------------------------------------------
           - glue
-          - gsm8k
+          # - gsm8k
           - kmmlu
           - qqp
           - pythia
