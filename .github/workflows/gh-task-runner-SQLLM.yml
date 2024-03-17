@@ -80,7 +80,7 @@ jobs:
         run_task:
           ### Few shot tasks
           ### ----------------------------------------------------------------------------
-          # - arc_challenge
+          - arc_challenge
           # - hellaswag
           # - truthfulqa_mc2
           # - winogrande
@@ -92,13 +92,10 @@ jobs:
           # - 2
           # - 5
           # - 10
-          # - 25
+          - 25
           
         include:
-          # Include mmlu with <= 5 fewshot
-          # As it does not work with > 5 fewshot
-          - run_task: arc_challenge
-            num_fewshot: 25
+          # Specify each task
           - run_task: hellaswag
             num_fewshot: 10
           - run_task: mmlu
