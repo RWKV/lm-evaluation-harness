@@ -65,7 +65,7 @@ runs:
         python -m pip install -e .
 
         # Fix some HF dependencies issues
-        python -m pip install transformers accelerate setuptools
+        python -m pip install -U transformers accelerate setuptools
         # Needed for ifeval
         python -m pip install langdetect immutabledict
         # Needed for some models
