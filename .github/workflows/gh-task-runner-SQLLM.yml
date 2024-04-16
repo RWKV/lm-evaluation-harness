@@ -99,7 +99,7 @@ jobs:
         include:
           # Specify each task
           - run_task: arc_challenge
-            num_fewshot: 5
+            num_fewshot: 25
           - run_task: hellaswag
             num_fewshot: 10
           - run_task: truthfulqa_mc2
