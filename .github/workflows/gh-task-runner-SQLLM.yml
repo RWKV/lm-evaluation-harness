@@ -68,9 +68,6 @@ env:
 jobs:
   gh-task-runner:
 
-    # Check for approval notice
-    if: ${{ github.event.inputs.approval_notice == 'APPROVED' }}
-
     # Strategy Matrix
     strategy:
       # Disable fail-fast behavior
