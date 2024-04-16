@@ -80,7 +80,9 @@ jobs:
         run_task:
           ### Few shot tasks
           ### ----------------------------------------------------------------------------
-          - arc_challenge
+          - mmlu
+          - winogrande
+          - gsm8k
           # - hellaswag
           # - truthfulqa_mc2
           # - winogrande
@@ -88,24 +90,20 @@ jobs:
           # - kmmlu_*
 
         num_fewshot:
+          - 5
           # - 1
           # - 2
-          # - 5
           # - 10
-          - 25
+          # - 25
           
         include:
           # Specify each task
+          - run_task: arc_challenge
+            num_fewshot: 5
           - run_task: hellaswag
             num_fewshot: 10
-          - run_task: mmlu
-            num_fewshot: 5
           - run_task: truthfulqa_mc2
             num_fewshot: 0
-          - run_task: winogrande
-            num_fewshot: 5
-          - run_task: gsm8k
-            num_fewshot: 5
           
     # Name of the job
     name: "[${{ matrix.run_task }} - fs:${{ matrix.num_fewshot }}] ${{ github.event.inputs.rwkv5_file_url && github.event.inputs.rwkv5_test_name || github.event.inputs.model_hf_repo }} - ${{ github.event.inputs.model_args }}"
