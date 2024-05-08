@@ -74,6 +74,9 @@ runs:
         python -m pip install ai2-olmo
         # Needed for sealion model
         python -m pip install sentencepiece
+        # Needed for RWKV v6
+        pip install -U git+https://github.com/sustcsonglin/flash-linear-attention
+        pip install triton==2.2.0
 
         # Setup HF cache
         chmod +x ./gh-task-runner/*.sh
