@@ -47,10 +47,10 @@ runs:
       shell: bash
       run: nvidia-smi
 
-    # Dependencies setup
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.11' 
+    # # Dependencies setup (this cause python virutalization error for v6)
+    # - uses: actions/setup-python@v5
+    #   with:
+    #     python-version: '3.11' 
     
     - name: Install dependencies / setup project
       shell: bash
