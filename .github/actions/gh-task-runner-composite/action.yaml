@@ -75,10 +75,12 @@ runs:
         # Needed for sealion model
         python -m pip install sentencepiece
         # Needed for RWKV v6
-        pip install -U git+https://github.com/sustcsonglin/flash-linear-attention
-        pip install triton==2.2.0
-        # Some lm eval install issues
-        pip install peft
+        python -m pip install flash-attn
+        python -m pip install -U git+https://github.com/sustcsonglin/flash-linear-attention
+        python -m pip install triton==2.2.0
+
+        # Some huggingface accelerate missing packages issue (WTH)
+        python -m pip install peft sqlitedict accelerate evaluate sacrebleu scikit-learn pytablewriter
 
         # Setup HF cache
         chmod +x ./gh-task-runner/*.sh
