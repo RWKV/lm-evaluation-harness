@@ -80,7 +80,7 @@ runs:
         python -m pip install triton==2.2.0
 
         # Some huggingface accelerate missing packages issue (WTH)
-        python -m pip install peft sqlitedict accelerate evaluate sacrebleu scikit-learn pytablewriter
+        python -m pip install peft sqlitedict accelerate evaluate sacrebleu scikit-learn pytablewriter rouge_score
 
         # Setup HF cache
         chmod +x ./gh-task-runner/*.sh
